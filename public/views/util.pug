@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    title Utilities
+    meta(charset='utf-8')
+  body
+    div(style='margin: 10px') 想知道哪個公車路線嗎？
+      form(method='POST' action='/routes')
+        span Choose a City:
+          select(name='City' style='margin: 10px')
+            each item in cities
+              option(value=item) #{item}
+        span Enter a RouteName of Bus: 
+          input(type='text' name='RouteName')
+        Button(type='submit') submit
+    div(style='margin: 10px') 想知道哪個公車站有哪些公車經過嗎？
+      form(method='POST' action='/stops')
+        span Choose a City:
+          select(name='City' style='margin: 10px')
+            each item in cities
+              option(value=item) #{item}
+        span Enter a Name of a Stop: 
+          input(type='text' name='StopName')
+        Button(type='submit') submit

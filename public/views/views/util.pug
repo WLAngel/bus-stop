@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title Utilities
+    meta(charset='utf-8')
+  body
+    div
+      form(method='POST' action='/routes')
+        span Choose a City: 
+          select(name='city')
+            each item in cities
+              option(value=item) #{item}
+        span Enter a RouteName of Bus: 
+          input(type='text' name='RouteName')
+        Button(type='submit') submit
