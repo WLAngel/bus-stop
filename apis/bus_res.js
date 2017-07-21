@@ -11,12 +11,12 @@ function route(City, RouteName) {
   // TODO go query MOTC api http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/
   // and return stops of the RouteName's route
 
-  return City + ' ' + RouteName + ' route'
+  return undefined
 }
 
 function stop(City, StopName) {
   // TODO go query MOTC api http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/
   // and return all the routes passing through this stop
 
-  return City + ' ' + StopName + ' stop'
+  return undefined
 }

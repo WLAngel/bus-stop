@@ -1,0 +1,59 @@
+
+
+.container {
+  display: flex;
+}
+
+.right {
+  padding: 10px;
+  float: left;
+  height: 400px;
+  width: 80%;
+  margin: 0;
+}
+
+.title {
+  text-align: center;
+}
+
+.left {
+  padding: 10px;
+  float: left;
+  width: 20%;
+  margin: 0;
+}
+
+.stoplist {
+  padding: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.routesContainer {
+  padding: 10px
+}
+
+.routeButton {
+  margin: 1px;
+  color: black;
+  background-color: white;
+  border: 1px solid #555555;
+}
+
+.utilContainer {
+  display: inline-block;
+  margin: 10px;
+  width: 50%;
+  text-align: center;
+}
+
+#stops {
+  margin: 0;
+  margin-top: 16px;
+}
+
+Button:focus {
+  outline: none;
+}

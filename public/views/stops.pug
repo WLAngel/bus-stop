@@ -1,9 +1,29 @@
 doctype html
 html
   head
-    title Utilities
+    title 站牌
     meta(charset='utf-8')
+    link(rel='stylesheet', href='../css/style.css')
   body
-    h1 #{city} #{stopname}
-    
-        
+    div.content
+      h1.title #{city} #{stopname}
+      div.routesContainer
+        each item in routelist
+          button.routeButton(id=item.RouteName.Zh_tw+' '+item.Direction onclick='getStops(this)')= item.RouteName.Zh_tw + (item.Direction ? ' 返' : ' 去')
+        ol#stops
+      script.
+        function getStops(element) {
+          var routelist = !{ JSON.stringify(routelist) }
+          var stops = document.getElementById('stops')
+          stops.innerHTML = ''
+          for(a in routelist) {
+            var temp = routelist[a]
+            if(element.id === temp.RouteName.Zh_tw + ' ' + temp.Direction) {
+              for(var i = 0; i < temp.Stops.length; i++) {
+                var child = document.createElement('li')
+                child.appendChild(document.createTextNode(temp.Stops[i].StopName.Zh_tw))
+                stops.appendChild(child)
+              }
+            }
+          }
+        }
