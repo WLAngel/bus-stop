@@ -13,8 +13,8 @@ html
       div.container
         div.left
         div.right#googleMap for google map api
-    include routeScript.pug
     script.
+      var routeID
       function getStops(element) {
         var xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
@@ -28,6 +28,7 @@ html
         
         City = city
         RouteName = routename
+        routeID = element.id
         Direction = element.id.slice(-1)
         xhttp.send(JSON.stringify({
           City,
@@ -35,3 +36,4 @@ html
           Direction
         }))
       }
+    include routeScript.pug

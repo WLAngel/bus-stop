@@ -1,3 +1,4 @@
 ul.stoplist
   each item in Stops
-    li= item.StopName + ' ' + (Math.floor(item.EstimateTime/60) ? (Math.floor(item.EstimateTime/60) + '分') : '') + (item.EstimateTime - Math.floor(item.EstimateTime/60)*60) + '秒'
+    li= item.StopName + ' '
+      = item.EstimateTime ? (Math.floor(item.EstimateTime/60) ? (Math.floor(item.EstimateTime/60) + '分') : '') + (item.EstimateTime - Math.floor(item.EstimateTime/60)*60) + '秒' : '未發車'

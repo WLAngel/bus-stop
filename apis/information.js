@@ -57,7 +57,7 @@ function Route(RouteName, City) {
 }
 
 
-function EstimatedTimeOfArrival(RouteName, City) {
+function EstimatedTimeOfArrival(RouteName, City, Direction) {
     return new Promise((resolve, reject) => {
         let Name = encodeURI(RouteName),
             localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27&$%from=JSON`,
@@ -79,7 +79,7 @@ function EstimatedTimeOfArrival(RouteName, City) {
                             'StopSequence': data[i]['StopSequence'],
                         })
                     }
-                    resolve(Buses)
+                    resolve(Buses.filter(x => x.Direction == Direction).sort((x, y) => x.StopSequence - y.StopSequence))
                 }
             })
     })

@@ -147,6 +147,10 @@ app.post('/routes', (req, res) => {
 
 
   bus.Route(routename, c.En[city]).then(stoplist => {
+    if(stoplist.length === 0) {
+      return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
+        'City or check your input. <a href=\'/bus\'>返回</a>')
+    }
     res.render('routes', {
       city,
       routename,
@@ -186,20 +190,25 @@ app.post('/ajroutes', (req, res) => {
   var routename = req.body.RouteName
   var direction = req.body.Direction
 
-  // TODO estimate time
+  bus.EstimatedTimeOfArrival(routename, c.En[city], direction).then(est => {
+    bus.Route(routename, c.En[city]).then(routelist => {
+      // routelist = 有哪些路線
+      if(routelist[0].Direction == direction)
+        var Stops = routelist[0].Stops
+      else
+        var Stops = routelist[1].Stops
 
+      var count = 0
+      for(var i = 0; i < Stops.length; i++) {
+        if(est[count].StopName === Stops[i].StopName) {
+          Stops[i].EstimateTime = est[count].EstimateTime
+          count++
+        }
+      }
 
-  bus.Route(routename, c.En[city]).then(routelist => {
-    // routelist = 有哪些路線
-    if(routelist[0].Direction === direction)
-      stoplist = routelist[0]
-    else
-      stoplist = routelist[1]
-
-    var Stops = stoplist.Stops
-
-    res.render('routeBody', {
-      Stops
+      res.render('routeBody', {
+        Stops
+      })
     })
   })
 

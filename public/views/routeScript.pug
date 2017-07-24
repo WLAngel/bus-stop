@@ -1,7 +1,7 @@
 script.
   var city = !{ JSON.stringify(city) }
   var routename = !{ JSON.stringify(routename) }
-  console.log(city)
+  
   document.addEventListener('DOMContentLoaded', function() {
     setInterval(() => {
       var xhttp = new XMLHttpRequest()
@@ -16,7 +16,8 @@ script.
       
       xhttp.send(JSON.stringify({
         "City": city,
-        "RouteName": routename
+        "RouteName": routename,
+        "Direction": routeID.slice(-1)
       }))
       
     }, 15000)
