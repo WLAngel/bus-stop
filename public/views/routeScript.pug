@@ -1,0 +1,23 @@
+script.
+  var city = !{ JSON.stringify(city) }
+  var routename = !{ JSON.stringify(routename) }
+  console.log(city)
+  document.addEventListener('DOMContentLoaded', function() {
+    setInterval(() => {
+      var xhttp = new XMLHttpRequest()
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          /*document = this.response*/
+          document.getElementsByClassName('left')[0].innerHTML = this.responseText
+        }
+      }
+      xhttp.open('POST', '/ajroutes', true)
+      xhttp.setRequestHeader("Content-type", "application/json")
+      
+      xhttp.send(JSON.stringify({
+        "City": city,
+        "RouteName": routename
+      }))
+      
+    }, 15000)
+  })

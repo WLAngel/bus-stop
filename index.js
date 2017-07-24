@@ -145,7 +145,6 @@ app.post('/routes', (req, res) => {
   var city = req.body.City
   var routename = req.body.RouteName
 
-
   res.render('routes', {
     city,
     routename,
@@ -163,17 +162,30 @@ app.post('/stops', (req, res) => {
   })
 })
 
-app.get('/util', (req, res) => {
-  res.render('util.pug', {
+app.get('/bus', (req, res) => {
+  res.render('bus.pug', {
     cities: c.cities
   })
 })
 
-// TODO root page reserved
-app.get('/', function (req, res) {
-  res.send('The Page is Reserved!')
+app.post('/ajroutes', (req, res) => {
+  var city = req.body.City
+  var routename = req.body.RouteName
+
+  stoplist[0].EstimateTime = parseInt(Math.random(0, 1)*100)
+
+  res.render('routeBody', {
+    city,
+    routename,
+    stoplist
+  })
 })
 
-app.listen(8888, function () {
-  console.log('Example app listening on port 8888!')
+// TODO root page reserved maybe for member system
+app.use('/', (req, res) => {
+  res.status(404).send('not found')
+})
+
+app.listen(8888, () => {
+
 })

@@ -7,18 +7,9 @@ html
   body
     div.content
       h1.title #{city} #{routename}
+      a(href='/bus' style='margin: 5%') 返回
       div.container
         div.left
-          ul.stoplist
-            each item in stoplist
-              li= item.StopName.Zh_tw + ' ' + item.EstimateTime +'秒'
+          include routeBody.pug
         div.right#googleMap for google map api
-        //script.
-        //  function myMap() {
-        //    var mapProp= {
-        //      center:new google.maps.LatLng(51.508742,-0.120850),
-        //      zoom:5
-        //    }
-        //    var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
-        //  }
-        //script(src='https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=myMap')
+    include routeScript.pug

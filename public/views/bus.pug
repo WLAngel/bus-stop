@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    title Utilities
+    title Bus
     meta(charset='utf-8')
     link(rel='stylesheet', href='../css/style.css')
   body
@@ -16,7 +16,7 @@ html
                 each item in cities
                   option(value=item) #{item}
             span Enter a RouteName of Bus: 
-              input(type='text' name='RouteName')
+              input(type='text' name='RouteName' required)
             Button(type='submit') submit
         div.utilContainer
           h3 想知道哪個公車站有哪些公車經過嗎？
@@ -26,5 +26,5 @@ html
                 each item in cities
                   option(value=item) #{item}
             span Enter a Name of a Stop: 
-              input(type='text' name='StopName')
+              input(type='text' name='StopName' required)
             Button(type='submit') submit

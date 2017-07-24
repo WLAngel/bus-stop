@@ -2,6 +2,14 @@
 
 .container {
   display: flex;
+  margin: 2% 5%;
+}
+
+.left {
+  padding: 10px;
+  float: left;
+  width: 20%;
+  margin: 0;
 }
 
 .right {
@@ -16,13 +24,6 @@
   text-align: center;
 }
 
-.left {
-  padding: 10px;
-  float: left;
-  width: 20%;
-  margin: 0;
-}
-
 .stoplist {
   padding: 0;
   list-style: none;
@@ -32,7 +33,7 @@
 }
 
 .routesContainer {
-  padding: 10px
+  margin: 2% 5%
 }
 
 .routeButton {
