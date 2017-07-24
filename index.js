@@ -2,7 +2,7 @@ var express = require('express')
 var path = require('path')
 var bodyparser = require('body-parser')
 
-var bus = require('./apis/bus_res.js')
+var bus = require('./apis/information.js')
 var c = require('./public/static/city.js')
 
 var app = express()
@@ -145,21 +145,34 @@ app.post('/routes', (req, res) => {
   var city = req.body.City
   var routename = req.body.RouteName
 
-  res.render('routes', {
-    city,
-    routename,
-    stoplist
+
+  bus.Route(routename, c.En[city]).then(stoplist => {
+    res.render('routes', {
+      city,
+      routename,
+      stoplist
+    })
   })
 })
+
 app.post('/stops', (req, res) => {
   // TODO error handling
   var city = req.body.City
   var stopname = req.body.StopName
-  res.render('stops', {
-    city,
-    stopname,
-    routelist
+
+  bus.Stop(stopname, c.En[city]).then(() => {
+    // routelist = 有哪些路線
+
+
+
+    res.render('stops', {
+      city,
+      stopname,
+      routelist
+    })
   })
+
+
 })
 
 app.get('/bus', (req, res) => {
@@ -171,17 +184,27 @@ app.get('/bus', (req, res) => {
 app.post('/ajroutes', (req, res) => {
   var city = req.body.City
   var routename = req.body.RouteName
+  var direction = req.body.Direction
 
-  stoplist[0].EstimateTime = parseInt(Math.random(0, 1)*100)
+  // TODO estimate time
 
-  res.render('routeBody', {
-    city,
-    routename,
-    stoplist
+
+  bus.Route(routename, c.En[city]).then(routelist => {
+    // routelist = 有哪些路線
+    if(routelist[0].Direction === direction)
+      stoplist = routelist[0]
+    else
+      stoplist = routelist[1]
+
+    var Stops = stoplist.Stops
+
+    res.render('routeBody', {
+      Stops
+    })
   })
+
 })
 
-// TODO root page reserved maybe for member system
 app.use('/', (req, res) => {
   res.status(404).send('not found')
 })

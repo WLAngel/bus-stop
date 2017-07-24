@@ -8,8 +8,30 @@ html
     div.content
       h1.title #{city} #{routename}
       a(href='/bus' style='margin: 5%') 返回
+      each item in stoplist
+        button.routeButton(id=item.RouteName+' '+item.Direction onclick='getStops(this)')= item.RouteName + (item.Direction ? ' 返' : ' 去')
       div.container
         div.left
-          include routeBody.pug
         div.right#googleMap for google map api
     include routeScript.pug
+    script.
+      function getStops(element) {
+        var xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            /*document = this.response*/
+            document.getElementsByClassName('left')[0].innerHTML = this.responseText
+          }
+        }
+        xhttp.open('POST', '/ajroutes', true)
+        xhttp.setRequestHeader("Content-type", "application/json")
+        
+        City = city
+        RouteName = routename
+        Direction = element.id.slice(-1)
+        xhttp.send(JSON.stringify({
+          City,
+          RouteName,
+          Direction
+        }))
+      }
