@@ -3,7 +3,7 @@ const request = require('request')
 function Stop(StopName, City) {
     return new Promise((resolve, reject) => {
         let Name = encodeURI(StopName),
-            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}?$filter=Stops%2Fany(d%3Ad%2FStopName%2FZh_tw%20eq%20'${Name}')&$format=JSON`,
+            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}?$filter=Stops%2Fany(d%3Ad%2FStopName%2FZh_tw%20eq%20'${Name}')%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
             Route = []
         request({ uri: localUri },
             (err, res, data) => {
@@ -24,7 +24,7 @@ function Stop(StopName, City) {
 function Route(RouteName, City) {
     return new Promise((resolve, reject) => {
         let Name = encodeURI(RouteName),
-            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27&$%from=JSON`,
+            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
             Stops = []
         request({ uri: localUri },
             (err, res, data) => {
@@ -43,8 +43,8 @@ function Route(RouteName, City) {
                                 'StopName': data[i]['Stops'][j]['StopName']['Zh_tw'],
                                 'StopSequence': data[i]['Stops'][j]['StopSequence'],
                                 'Position': {
-                                    'Lat': data[i]['Stops'][j]['StopPosition']['PositionLat'],
-                                    'Lon': data[i]['Stops'][j]['StopPosition']['PositionLon']
+                                    'lat': data[i]['Stops'][j]['StopPosition']['PositionLat'],
+                                    'lng': data[i]['Stops'][j]['StopPosition']['PositionLon']
                                 }
                             }
                         }
@@ -104,8 +104,8 @@ function RealTimeByFrequency(RouteName, City) {
                             'Direction': data[i]['Direction'],
                             'BusStatus': data[i]['BusStatus'],
                             'BusPosition': {
-                                'Lat': data[i]['BusPosition']['PositionLat'],
-                                'Lon': data[i]['BusPosition']['PositionLon'],
+                                'lat': data[i]['BusPosition']['PositionLat'],
+                                'lng': data[i]['BusPosition']['PositionLon'],
                             },
                             'SrcUpdateTime': data[i]['SrcUpdateTime'],
                             'UpdateTime': data[i]['UpdateTime'],
