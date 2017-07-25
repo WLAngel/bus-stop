@@ -7,132 +7,6 @@ var c = require('./public/static/city.js')
 
 var app = express()
 
-
-// this is a test resource
-var stoplist = [
-  { "StopName": {
-      "Zh_tw": "力行新村",
-      "En": "Lixing New Village"
-    },
-    "RouteName": {
-      "Zh_tw": "793",
-      "En": "793"
-    },
-    "Direction": 0,
-    "EstimateTime": 49,
-    "SrcUpdateTime": "2017-07-19T17:59:50+08:00",
-    "UpdateTime": "2017-07-19T17:59:55+08:00",
-    "StopSequence": 5
-  },
-  { "StopName": {
-      "Zh_tw": "板橋榮家",
-      "En": "Banqiao Veterans Home"
-    },
-    "RouteName": {
-      "Zh_tw": "793",
-      "En": "793"
-    },
-    "Direction": 0,
-    "EstimateTime": 142,
-    "SrcUpdateTime": "2017-07-19T17:59:50+08:00",
-    "UpdateTime": "2017-07-19T17:59:55+08:00",
-    "StopSequence": 6
-  }
-]
-
-var routelist = [
-  {
-    "RouteName": {
-      "Zh_tw": "棕7",
-      "En": "BR7"
-    },
-    "Direction": 0,
-    "Stops": [
-      {
-        "StopUID": "NWT13799",
-        "StopID": "13799",
-        "StopName": {
-          "Zh_tw": "安祥路口",
-          "En": "Anxiang Rd. Intersection"
-        },
-        "StopBoarding": 0,
-        "StopSequence": 1,
-        "StopPosition": {
-          "PositionLat": 24.955150604248,
-          "PositionLon": 121.49210357666
-        }
-      },
-      {
-        "StopUID": "NWT13801",
-        "StopID": "13801",
-        "StopName": {
-          "Zh_tw": "大茅埔",
-          "En": "Damaopu"
-        },
-        "StopBoarding": 0,
-        "StopSequence": 2,
-        "StopPosition": {
-          "PositionLat": 24.9546337127686,
-          "PositionLon": 121.495101928711
-        }
-      },
-    ],
-    "UpdateTime": "2017-07-20T00:02:23+08:00"
-  },
-  {
-    "RouteName": {
-      "Zh_tw": "棕7",
-      "En": "BR7"
-    },
-    "Direction": 1,
-    "Stops": [
-      {
-        "StopUID": "NWT13883",
-        "StopID": "13883",
-        "StopName": {
-          "Zh_tw": "消防局(松仁)",
-          "En": "Fire Department(Songren)"
-        },
-        "StopBoarding": 0,
-        "StopSequence": 1,
-        "StopPosition": {
-          "PositionLat": 25.0391330718994,
-          "PositionLon": 121.568252563477
-        }
-      },
-      {
-        "StopUID": "NWT13885",
-        "StopID": "13885",
-        "StopName": {
-          "Zh_tw": "興雅國中",
-          "En": "Xingya Junior High School"
-        },
-        "StopBoarding": 0,
-        "StopSequence": 2,
-        "StopPosition": {
-          "PositionLat": 25.0366668701172,
-          "PositionLon": 121.568283081055
-        }
-      },
-      {
-        "StopUID": "NWT13887",
-        "StopID": "13887",
-        "StopName": {
-          "Zh_tw": "信義行政中心(松仁)",
-          "En": "Xinyi Dist. Admin. Center(Songren)"
-        },
-        "StopBoarding": 0,
-        "StopSequence": 3,
-        "StopPosition": {
-          "PositionLat": 25.0338497161865,
-          "PositionLon": 121.568298339844
-        }
-      },
-    ],
-    "UpdateTime": "2017-07-20T00:02:23+08:00"
-  }
-]
-
 app.set('views', path.join(__dirname, 'public', 'views'))
 app.set('view engine', 'pug')
 
@@ -146,7 +20,9 @@ app.post('/routes', (req, res) => {
   var routename = req.body.RouteName
 
 
-  bus.Route(routename, c.En[city]).then(stoplist => {
+  bus.Route(routename, c.En[city]).catch(() => {
+    return ''
+  }).then(stoplist => {
     if(stoplist.length === 0) {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
         'City or check your input. <a href=\'/bus\'>返回</a>')
@@ -164,11 +40,11 @@ app.post('/stops', (req, res) => {
   var city = req.body.City
   var stopname = req.body.StopName
 
-  bus.Stop(stopname, c.En[city]).then(() => {
-    // routelist = 有哪些路線
-
-
-
+  bus.Stop(stopname, c.En[city]).then(routelist => {
+    if(routelist.length === 0) {
+      return res.status(404).send('Can\'t find any RouteName in the City for the Stop, ' +
+      'please try another City or check your input. <a href=\'/bus\'>返回</a>')
+    }
     res.render('stops', {
       city,
       stopname,
@@ -190,22 +66,22 @@ app.post('/ajroutes', (req, res) => {
   var routename = req.body.RouteName
   var direction = req.body.Direction
 
-  bus.EstimatedTimeOfArrival(routename, c.En[city], direction).then(est => {
+  bus.EstimatedTimeOfArrival(routename, c.En[city], direction).catch(console.error).then(est => {
     bus.Route(routename, c.En[city]).then(routelist => {
-      // routelist = 有哪些路線
       if(routelist[0].Direction == direction)
         var Stops = routelist[0].Stops
       else
         var Stops = routelist[1].Stops
 
       var count = 0
-      for(var i = 0; i < Stops.length; i++) {
-        if(est[count].StopName === Stops[i].StopName) {
-          Stops[i].EstimateTime = est[count].EstimateTime
-          count++
+      if(est.length) {
+        for(var i = 0; i < Stops.length; i++) {
+          if(est[count].StopName === Stops[i].StopName) {
+            Stops[i].EstimateTime = est[count].EstimateTime
+            count++
+          }
         }
       }
-
       res.render('routeBody', {
         Stops
       })

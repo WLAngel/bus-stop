@@ -33,7 +33,7 @@
 }
 
 .routesContainer {
-  margin: 2% 5%
+  margin: 2% 5%;
 }
 
 .routeButton {
@@ -53,6 +53,7 @@
 #stops {
   margin: 0;
   margin-top: 16px;
+  padding: 0;
 }
 
 Button:focus {

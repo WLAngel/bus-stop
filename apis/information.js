@@ -28,7 +28,7 @@ function Route(RouteName, City) {
             Stops = []
         request({ uri: localUri },
             (err, res, data) => {
-                if (err)
+                if (err || res.statusCode !== 200)
                     reject(err)
                 else {
                     data = JSON.parse(data)

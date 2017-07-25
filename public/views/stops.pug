@@ -10,21 +10,28 @@ html
       a(href='/bus' style='margin: 5%') 返回
       div.routesContainer
         each item in routelist
-          button.routeButton(id=item.RouteName.Zh_tw+' '+item.Direction onclick='getStops(this)')= item.RouteName.Zh_tw + (item.Direction ? ' 返' : ' 去')
-        ol#stops
-      script.
-        function getStops(element) {
-          var routelist = !{ JSON.stringify(routelist) }
-          var stops = document.getElementById('stops')
-          stops.innerHTML = ''
-          for(a in routelist) {
-            var temp = routelist[a]
-            if(element.id === temp.RouteName.Zh_tw + ' ' + temp.Direction) {
-              for(var i = 0; i < temp.Stops.length; i++) {
-                var child = document.createElement('li')
-                child.appendChild(document.createTextNode(temp.Stops[i].StopName.Zh_tw))
-                stops.appendChild(child)
-              }
-            }
+          button.routeButton(id=item+' 0' onclick='getStops(this)')= item + ' 去'
+          button.routeButton(id=item+' 1' onclick='getStops(this)')= item + ' 返'
+        ul#stops
+    script.
+      function getStops(element) {
+        var xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var stops = document.getElementById('stops')
+            stops.innerHTML = ''
+            document.getElementById('stops').innerHTML = this.responseText
           }
         }
+        xhttp.open('POST', '/ajroutes', true)
+        xhttp.setRequestHeader("Content-type", "application/json")
+        
+        var City = !{ JSON.stringify(city) }
+        RouteName = element.id.slice(0, -2)
+        Direction = element.id.slice(-1)
+        xhttp.send(JSON.stringify({
+          City,
+          RouteName,
+          Direction
+        }))
+      }
