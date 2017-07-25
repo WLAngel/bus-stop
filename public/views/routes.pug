@@ -4,6 +4,7 @@ html
     title 公車路線
     meta(charset='utf-8')
     link(rel='stylesheet', href='../css/style.css')
+    script(async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw&callback=initMap")
   body
     div.content
       h1.title #{city} #{routename}
@@ -12,7 +13,7 @@ html
         button.routeButton(id=item.RouteName+' '+item.Direction onclick='getStops(this)')= item.RouteName + (item.Direction ? ' 返' : ' 去')
       div.container
         div.left
-        div.right#googleMap for google map api
+        div.right#map
     script.
       var routeID
       function getStops(element) {
@@ -36,3 +37,6 @@ html
         }))
       }
     include routeScript.pug
+    script.
+      var data = !{ JSON.stringify(stoplist) }
+    script(src='../static/googleinitMap.js')

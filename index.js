@@ -19,7 +19,6 @@ app.post('/routes', (req, res) => {
   var city = req.body.City
   var routename = req.body.RouteName
 
-
   bus.Route(routename, c.En[city]).catch(() => {
     return ''
   }).then(stoplist => {
@@ -30,7 +29,7 @@ app.post('/routes', (req, res) => {
     res.render('routes', {
       city,
       routename,
-      stoplist
+      stoplist,
     })
   })
 })
