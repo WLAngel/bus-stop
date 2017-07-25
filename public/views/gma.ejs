@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>google map</title>
+    <script>
+        var data =<%- data %>
+        var timedata =<%- timedata %>
+    </script>
+    <script src='../googleinitMap.js'></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw&callback=initMap"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            margin: 0 auto;
+            width: 1000px;
+            height: 100%;
+            opacity: 0.9;
+            background-color: #F0FFFF;
+
+            background-repeat: no-repeat;
+            background-size: 30%;
+            background-position: center center;
+        }
+        .routenamediv{
+            margin:0 auto;
+        }
+        .routename {
+            
+            display: inline;
+
+        }
+
+        div {
+            margin: 0 auto;
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        .infowindow {
+            margin: 0px;
+            color: blue;
+        }
+
+
+        .map {
+            height: 400px;
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        <h1 class="title">IBus Search(IBS)</h1>
+    </div>
+    <div class='routenamediv'>
+
+        <% for(let i=0;i<stopdata.length;i++){ %>
+            <form class='routename'  action='routename<%= stopdata[i] %>' method="get"><button type='submit' value='<%= stopdata[i] %>'> <%= stopdata[i] %></button></form>
+            <% } %>
+
+    </div>
+
+    <div class="map" id="map"></div>
+
+
+</body>
+
+</html>
