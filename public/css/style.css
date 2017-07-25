@@ -2,18 +2,29 @@
 
 .container {
   display: flex;
-  margin: 2% 5%;
+  margin: 2% 3%;
+}
+
+table, th, td {
+    border: 2px solid #EEEEEE;
+    border-collapse: collapse;
+}
+
+tr {
+  text-align: left;
 }
 
 .left {
-  padding: 10px;
+  padding: 8px;
   float: left;
   width: 20%;
   margin: 0;
+  height: 600px;
+  overflow: scroll;
 }
 
 .right {
-  padding: 10px;
+  padding: 8px;
   float: left;
   height: 600px;
   width: 80%;
@@ -30,6 +41,7 @@
   padding: 0;
   margin: 0;
   text-align: center;
+  weight: 100%;
 }
 
 .routesContainer {

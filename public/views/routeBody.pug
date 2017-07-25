@@ -1,4 +1,9 @@
-ul.stoplist
+table.stoplist
+  tr
+    th 站名
+    th 預估時間
+  tr
   each item in Stops
-    li= item.StopName + ' '
-      = item.EstimateTime ? (Math.floor(item.EstimateTime/60) ? (Math.floor(item.EstimateTime/60) + '分') : '') + (item.EstimateTime - Math.floor(item.EstimateTime/60)*60) + '秒' : '未發車'
+    tr
+      td= item.StopName + ' '
+      td= item.EstimateTime !== undefined ? (item.EstimateTime === 0 ? '進站中' : Math.floor(item.EstimateTime/60) ? Math.floor(item.EstimateTime/60) + '分' : '將進站') : '未發車'

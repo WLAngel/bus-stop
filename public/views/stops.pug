@@ -15,6 +15,11 @@ html
         ul#stops
     script.
       function getStops(element) {
+        var buttons = document.getElementsByTagName('button')
+        for(var i = 0; i < buttons.length; i++) {
+          buttons[i].style.backgroundColor = 'white'
+        }
+        
         var xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
@@ -27,6 +32,7 @@ html
         xhttp.setRequestHeader("Content-type", "application/json")
         
         var City = !{ JSON.stringify(city) }
+        element.style.backgroundColor = '#ffb3b3'
         RouteName = element.id.slice(0, -2)
         Direction = element.id.slice(-1)
         xhttp.send(JSON.stringify({

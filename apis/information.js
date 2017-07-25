@@ -117,10 +117,25 @@ function RealTimeByFrequency(RouteName, City) {
     })
 }
 
+function Schedule(RouteName, City, Direction, Day) {
+
+  // return Schedule = {
+  //   RouteName (NameType): 路線名稱,
+  //   Direction (string): 去返程 = ['0: 去程', '1: 返程'],
+  //   TimeTable: [
+  //     BusStopTime {
+  //       StopName (NameType): 站牌名稱,
+  //       DepartureTime (string): 離站時間，格式為:HH:mm
+  //     }
+  //   ]
+  // }
+}
+
 
 module.exports = {
     Stop,
     Route,
     EstimatedTimeOfArrival,
     RealTimeByFrequency,
+    Schedule
   }

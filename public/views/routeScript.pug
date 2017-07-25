@@ -1,8 +1,9 @@
 script.
   var city = !{ JSON.stringify(city) }
   var routename = !{ JSON.stringify(routename) }
-  
+  var init = document.getElementById(routename+' 0')
   document.addEventListener('DOMContentLoaded', function() {
+    getStops(init)
     setInterval(() => {
       var xhttp = new XMLHttpRequest()
       xhttp.onreadystatechange = function() {
