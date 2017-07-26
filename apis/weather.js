@@ -1,16 +1,71 @@
+const request = require('request')
+const cheerio = require('cheerio')
+const CityID = require('./../public/static/CityID.json')
 
+function Weather(City, District) {
+  return new Promise((resolve, reject) => {
+    let ID = CityID[City][District]
+    let uri = `http://www.cwb.gov.tw/m/f/town368/${ID}.php`
+    let weather = []
+    request(uri, (err, res, body) => {
+
+      let $ = cheerio.load(body)
+
+      $('#retab1 tbody tr').each(function (i, element) {
+        weather.push($(this).text().replace(/\t/g, '').split('\n').filter(x => x !== ''))
+        if (weather[i].length !== 7)
+          weather[i].splice(3, 2, weather[i - 1][3])
+        else
+          weather[i].splice(4, 2)
+        weather[i].splice(1, 0, $('img', this).attr('title'))
+        weather[i][0] += ':00'
+        weather[i][2] = weather[i][2].split(' ').join('')
+        weather[i][3] = weather[i][3].split(' ').join('')
+      })
+
+      resolve(weather)
+    })
+  })
+}
+
+function Position(lat, lng) {
+  return new Promise((resolve, reject) => {
+    let uri = `http://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true`
+
+    request(uri, (err, res, body) => {
+      body = JSON.parse(body)
+      let City, District
+      for (let i = 0; i < body.results[0].address_components.length; i++) {
+        if (body.results[0].address_components[i].types[0] === 'administrative_area_level_1')
+          City = body.results[0].address_components[i].short_name
+        else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_3')
+          District = body.results[0].address_components[i].short_name
+      }
+
+      resolve([City.replace('台', '臺'), District.replace('台', '臺')])
+    })
+  })
+}
 
 function predict(lat, lng) {
+  return new Promise((resolve, reject) => {
+    Position(lat, lng).then(x => {
+      Weather(x[0], x[1]).then(y => resolve(y))
+    })
+  })
 
-  return
-  [
-    {
-      Time, // until today ends
-      Condition,
-      Temperature,
-      FeelTemp,
-      Humidity,
-      RainProb
-    }
-  ]
+  // [
+  //   {
+  //     Time: 'HH:MM', // until today ends
+  //     Condition: string,
+  //     Temperature: number(degree C),
+  //     FeelTemp: number(degree C),
+  //     Humidity: N %,
+  //     RainProb: N %
+  // }
+  // ]
+}
+
+module.exports = {
+  predict,
 }
