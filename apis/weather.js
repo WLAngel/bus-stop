@@ -14,7 +14,7 @@ function Weather(City, District) {
       $('#retab1 tbody tr').each(function (i, element) {
         weather.push($(this).text().replace(/\t/g, '').split('\n').filter(x => x !== ''))
         if (weather[i].length !== 7)
-          weather[i].splice(3, 2, weather[i - 1][3])
+          weather[i].splice(3, 2, weather[i - 1][4])
         else
           weather[i].splice(4, 2)
         weather[i].splice(1, 0, $('img', this).attr('title'))
@@ -22,6 +22,17 @@ function Weather(City, District) {
         weather[i][2] = weather[i][2].split(' ').join('')
         weather[i][3] = weather[i][3].split(' ').join('')
       })
+
+      for (let i = 0; i < weather.length; i++) {
+        weather[i] = {
+          'Time': weather[i][0],
+          'Condition': weather[i][1],
+          'Temperature': weather[i][2],
+          'FeelTemp': weather[i][3],
+          'Humidity': weather[i][4],
+          'RainProb': weather[i][5],
+        }
+      }
 
       resolve(weather)
     })
