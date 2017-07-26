@@ -3,7 +3,7 @@ var request = require('request');
 function BusSchedule(RouteName, City, Direction, Day) {
     RouteName = encodeURI(RouteName)
     return new Promise(function (resolve, reject) {
-        let url = 'http://ptx.transportdata.tw/MOTC/v2/Bus/Schedule/City/' + City + '/' + RouteName + '?$format=JSON'
+        let url = `http://ptx.transportdata.tw/MOTC/v2/Bus/Schedule/City/${City}/${RouteName}?$filter=RouteName%2FZh_tw%20eq%20%27${RouteName}%27&$format=JSON`
         request(url, function (err, res, body) {
             if (err) {
                 console.log('error:', err);
