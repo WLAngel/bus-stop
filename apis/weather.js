@@ -33,7 +33,10 @@ function Weather(City, District) {
           'RainProb': weather[i][5],
         }
       }
-
+      weather = {
+        District,
+        weather
+      }
       resolve(weather)
     })
   })
@@ -58,9 +61,11 @@ function Position(lat, lng) {
   })
 }
 
-function predict(lat, lng) {
+function predict(lat, lng, District) {
   return new Promise((resolve, reject) => {
     Position(lat, lng).then(x => {
+      if (District[x[1]])
+        resolve(x[1])
       Weather(x[0], x[1]).then(y => resolve(y))
     })
   })
