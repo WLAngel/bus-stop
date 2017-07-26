@@ -12,6 +12,7 @@ html
     div.content
       h1.title #{city} #{routename}
       a(href='/bus' style='margin: 5%') 返回
+      button.schButton 發車時間班表
       each item in stoplist
         button.routeButton(id=item.RouteName+' '+item.Direction onclick='getStops(this)')= item.RouteName + (item.Direction ? ' 返' : ' 去')
       div.container
@@ -19,6 +20,29 @@ html
           div#loader
         div.right
           div#map
+    div.modal#modalWindow
+      div.modal-content
+        span.close &times;
+        h4 發車時間
+        p.schContent loading..
+    script.
+      var modal = document.getElementById('modalWindow')
+      var span = document.getElementsByClassName('close')[0]
+      var schButton = document.getElementsByClassName('schButton')[0]
+      
+      schButton.onclick = function() {
+        modal.style.display = 'block'
+      }
+      
+      span.onclick = function() {
+        modal.style.display = 'none'
+      }
+      
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none'
+        }
+      }
     script.
       var routeID
       function getStops(element) {
@@ -32,7 +56,67 @@ html
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             document.getElementsByClassName('left')[0].innerHTML = this.responseText
+            
+            var resScript = this.responseText.split('<\/script>')[0].slice(8)
+            eval(resScript)
+            
+            document.getElementsByClassName('schContent')[0].innerHTML = ''
+            
+            var table = document.createElement('table')
+            var tbody = document.createElement('tbody')
             element.style.backgroundColor = '#ffb3b3'
+            
+            if(schedule.TimeTable !== undefined) {
+              for(var i = 0; i < schedule.TimeTable.length; i++) {
+                if(i%4 === 0) {
+                  if(i !== 0) {
+                    tbody.appendChild(node)
+                  }
+                  var node = document.createElement('tr')
+                }
+                nodeContent = document.createElement('td')
+                nodeContent.append(schedule.TimeTable[i].DepartureTime)
+                node.appendChild(nodeContent)
+                
+              }
+              if(schedule.TimeTable.length%4)
+                tbody.appendChild(node)
+              table.style = 'border-collapse: collapse; width: 100%'
+              table.appendChild(tbody)
+              document.getElementsByClassName('schContent')[0].appendChild(table)
+            }
+            else {
+              var node = document.createElement('tr')
+              
+              nodeContent = document.createElement('td')
+              nodeContent.append('時間間距')
+              node.appendChild(nodeContent)
+              
+              nodeContent = document.createElement('td')
+              nodeContent.append('發車間距')
+              node.appendChild(nodeContent)
+              
+              tbody.appendChild(node)
+              
+              for(var i = 0; i < schedule.Frequencys.length; i++) {
+                node = document.createElement('tr')
+                nodeContent = document.createElement('td')
+                nodeContent.append(schedule.Frequencys[i].StartTime + ' ~ ' + schedule.Frequencys[i].EndTime)
+                node.appendChild(nodeContent)
+                
+                nodeContent = document.createElement('td')
+                var temp = schedule.Frequencys[i].MinHeadwayMins === schedule.Frequencys[i].MaxHeadwayMins ? schedule.Frequencys[i].MinHeadwayMins : (schedule.Frequencys[i].MinHeadwayMins + ' ~ ' + schedule.Frequencys[i].MaxHeadwayMins)
+                nodeContent.append(temp + ' 分')
+                node.appendChild(nodeContent)
+                
+                tbody.appendChild(node)
+              }
+              table.style = 'border-collapse: collapse; width: 100%'
+              table.appendChild(tbody)
+              document.getElementsByClassName('schContent')[0].appendChild(table)
+              
+            }
+            
           }
         }
         xhttp.open('POST', '/ajroutes', true)

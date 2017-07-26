@@ -4,6 +4,7 @@ var bodyparser = require('body-parser')
 
 var bus = require('./apis/information.js')
 var busSch = require('./apis/BusSchedule.js')
+var weather = require('./apis/weather.js')
 var c = require('./public/static/city.js')
 
 var app = express()
@@ -77,7 +78,7 @@ app.post('/ajroutes', (req, res) => {
   bus.EstimatedTimeOfArrival(routename, c.En[city], direction).catch(console.error).then(est => {
     bus.Route(routename, c.En[city]).then(routelist => {
       busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()]).then(schedule => {
-        
+
         if(routelist[0].Direction == direction)
           var Stops = routelist[0].Stops
         else
@@ -87,9 +88,21 @@ app.post('/ajroutes', (req, res) => {
         for(var i = 0; i < est.length; i++) {
           estimate[est[i].StopName] = est[i].EstimateTime
         }
-        if(Stops[0].EstimateTime === undefined) {
 
+        if(schedule.TimeTable) {
+          if(estimate[Stops[0].StopName] === undefined) {
+            function nextBus(now) {
+              var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0])*100+Number(x.DepartureTime.split(':')[1]) >= now.getHours()*100 + now.getMinutes() )
+              return filt[0]
+            }
+            var next = nextBus(new Date())
+            estimate[next.StopName] = next.DepartureTime
+
+
+          }
         }
+
+
         res.render('routeBody', {
           Stops,
           estimate,
