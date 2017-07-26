@@ -6,4 +6,5 @@ table.stoplist
   each item in Stops
     tr
       td= item.StopName + ' '
-      td= item.EstimateTime !== undefined ? (item.EstimateTime === 0 ? '進站中' : Math.floor(item.EstimateTime/60) ? Math.floor(item.EstimateTime/60) + '分' : '將進站') : '未發車'
+      - var a = item.StopName
+      td= estimate[a] !== undefined ? (estimate[a] === 0 ? '進站中' : Math.floor(estimate[a]/60) ? Math.floor(estimate[a]/60) + '分' : '將進站') : '未發車'

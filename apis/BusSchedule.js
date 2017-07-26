@@ -4,14 +4,12 @@ function BusSchedule(RouteName, City, Direction, Day) {
     RouteName = encodeURI(RouteName)
     return new Promise(function (resolve, reject) {
         let url = 'http://ptx.transportdata.tw/MOTC/v2/Bus/Schedule/City/' + City + '/' + RouteName + '?$format=JSON'
-        console.log(url)
         request(url, function (err, res, body) {
             if (err) {
                 console.log('error:', err);
             }
             else {
                 var Schedule
-                console.log('statusCode:', res && res.statusCode);
                 if (!body)
                     return []
                 body = JSON.parse(body)
@@ -29,12 +27,19 @@ function BusSchedule(RouteName, City, Direction, Day) {
                         }
                     }
                     )
-                    //console.log(day)
                      Schedule = {
                         RouteName: body.RouteName.Zh_tw,
                         Direction: Direction,
                         TimeTable: day
                     }
+
+
+                    Schedule.TimeTable.sort((x, y) => {
+                      a = x.DepartureTime.split(':')
+                      b = y.DepartureTime.split(':')
+                      return (Number(a[0])*100 + Number(a[1])) -
+                        (Number(b[0])*100 + Number(b[1]))
+                    })
                 } else {
                     day = body.Frequencys.filter((e) => e.ServiceDay[Day]).map(function (e) {
                         return {
@@ -45,17 +50,25 @@ function BusSchedule(RouteName, City, Direction, Day) {
                         }
 
                     })
-                    //console.log(day)
                      Schedule = {
                         RouteName: body.RouteName.Zh_tw,
                         Direction: Direction,
-                        Frequencys:day
+                        Frequencys: day
                     }
+
+                    Schedule.Frequencys.sort((x, y) => {
+                      a = x.StartTime.split(':')
+                      b = y.StartTime.split(':')
+                      return (Number(a[0])*100 + Number(a[1])) -
+                        (Number(b[0])*100 + Number(b[1]))
+                    })
                 }
                 resolve(Schedule)
             }
         })
     })
-
 }
-//BusSchedule('307', 'Taipei', 0, 'Monday').then(data=>console.log(data))
+
+module.exports = {
+  BusSchedule
+}

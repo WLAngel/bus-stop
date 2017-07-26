@@ -117,36 +117,9 @@ function RealTimeByFrequency(RouteName, City) {
     })
 }
 
-function Schedule(RouteName, City, Direction, Day) {
-
-  // return Schedule = {
-  //   RouteName (NameType): 路線名稱,
-  //   Direction (string): 去返程 = ['0: 去程', '1: 返程'],
-  //   (Timetables or Frequencys)
-  // }
-  // TimeTables: [
-  //     {
-  //         StopName (NameType): 站牌名稱,
-  //         DepartureTime (string): 離站時間，格式為:HH:mm
-  //     },
-  // ]
-  //
-  // Frequencys: [
-  //     {
-  //         StartTime (string): 發車班距起始適用時間，格式為: HH:mm ,
-  //         EndTime (string): 發車班距結束適用時間，格式為: HH:mm ,
-  //         MinHeadwayMins (integer): 最小班距時間(分鐘) ,
-  //         MaxHeadwayMins (integer): 最大班距時間(分鐘) ,
-  //     },
-  // ]
-
-}
-
-
 module.exports = {
     Stop,
     Route,
     EstimatedTimeOfArrival,
     RealTimeByFrequency,
-    Schedule
   }

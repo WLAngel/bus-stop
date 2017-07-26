@@ -3,6 +3,7 @@ var path = require('path')
 var bodyparser = require('body-parser')
 
 var bus = require('./apis/information.js')
+var busSch = require('./apis/BusSchedule.js')
 var c = require('./public/static/city.js')
 
 var app = express()
@@ -14,6 +15,16 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
 
+const days = {
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday',
+  7: 'Sunday',
+}
+
 app.post('/routes', (req, res) => {
   // TODO error handling
   var city = req.body.City
@@ -24,7 +35,7 @@ app.post('/routes', (req, res) => {
   }).then(stoplist => {
     if(stoplist.length === 0) {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
-        'City or check your input. <a href=\'/bus\'>返回</a>')
+      'City or check your input. <a href=\'/bus\'>返回</a>')
     }
     res.render('routes', {
       city,
@@ -50,8 +61,6 @@ app.post('/stops', (req, res) => {
       routelist
     })
   })
-
-
 })
 
 app.get('/bus', (req, res) => {
@@ -67,26 +76,28 @@ app.post('/ajroutes', (req, res) => {
 
   bus.EstimatedTimeOfArrival(routename, c.En[city], direction).catch(console.error).then(est => {
     bus.Route(routename, c.En[city]).then(routelist => {
-      if(routelist[0].Direction == direction)
-        var Stops = routelist[0].Stops
-      else
-        var Stops = routelist[1].Stops
+      busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()]).then(schedule => {
+        
+        if(routelist[0].Direction == direction)
+          var Stops = routelist[0].Stops
+        else
+          var Stops = routelist[1].Stops
 
-      var count = 0
-      if(est.length) {
-        for(var i = 0; i < Stops.length; i++) {
-          if(est[count].StopName === Stops[i].StopName) {
-            Stops[i].EstimateTime = est[count].EstimateTime
-            count++
-          }
+        var estimate = {}
+        for(var i = 0; i < est.length; i++) {
+          estimate[est[i].StopName] = est[i].EstimateTime
         }
-      }
-      res.render('routeBody', {
-        Stops
+        if(Stops[0].EstimateTime === undefined) {
+
+        }
+        res.render('routeBody', {
+          Stops,
+          estimate,
+          schedule
+        })
       })
     })
   })
-
 })
 
 app.use('/', (req, res) => {
@@ -94,5 +105,5 @@ app.use('/', (req, res) => {
 })
 
 app.listen(8888, () => {
-
+  console.log('server up on port 8888')
 })
