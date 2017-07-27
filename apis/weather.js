@@ -33,10 +33,6 @@ function Weather(City, District) {
           'RainProb': weather[i][5],
         }
       }
-      weather = {
-        District,
-        weather
-      }
       resolve(weather)
     })
   })
@@ -55,18 +51,28 @@ function Position(lat, lng) {
         else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_3')
           District = body.results[0].address_components[i].short_name
       }
-
-      resolve([City.replace('台', '臺'), District.replace('台', '臺')])
+      resolve({ 'City': City.replace('台', '臺'), 'District': District.replace('台', '臺') })
     })
   })
 }
 
-function predict(lat, lng, District) {
+function predict(array) {
   return new Promise((resolve, reject) => {
-    Position(lat, lng).then(x => {
-      if (District[x[1]])
-        resolve(x[1])
-      Weather(x[0], x[1]).then(y => resolve(y))
+    let promises = [], check = {}
+    for (let i = 0; i < array.length; i++)
+      promises[i] = Position(array[i].Position.lat, array[i].Position.lng).then(x => array[i]['City'] = x)
+    Promise.all(promises).then(() => {
+      promises = []
+      for (let i = 0; i < array.length; i++) {
+        if (check[array[i].City.District])
+          array[i]['Weather'] = check[array[i].City.District]
+        else
+          promises[i] = Weather(array[i].City.City, array[i].City.District).then(x => {
+            array[i]['Weather'] = x
+            check[array[i].City.District] = x
+          })
+      }
+      Promise.all(promises).then(() => resolve(array))
     })
   })
 
