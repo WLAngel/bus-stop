@@ -40,7 +40,7 @@ function Route(RouteName, City) {
                             'KeyPattern': data[i]['KeyPattern'],
                             'RouteName': data[i]['RouteName']['Zh_tw'],
                             'Direction': data[i]['Direction'],
-                            'SubRouteName': data[i]['SubRouteName'],
+                            'SubRouteUID': data[i]['SubRouteUID'],
                         })
                         Stops[i]['Stops'] = []
                         for (let j = 0; j < data[i]['Stops'].length; j++) {
