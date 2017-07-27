@@ -55,8 +55,7 @@ function Position(lat, lng) {
         else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_3')
           District = body.results[0].address_components[i].short_name
       }
-
-      resolve([City.replace('台', '臺'), District.replace('台', '臺')])
+      resolve({ 'City': City.replace('台', '臺'), 'District': District.replace('台', '臺') })
     })
   })
 }
@@ -70,22 +69,24 @@ function Position(lat, lng) {
     })
   })
 }*/
-function predict(lat, lng, District, obj) {
+function predict(lat, lng, obj) {
   return new Promise((resolve, reject) => {
+    let check = {}
     Position(lat, lng).then(x => {
-      if (District[x[1]])
-        resolve(x[1])
-      Weather(x[0], x[1]).then(function (y) {
+      if (check[x.District])
+        resolve(check.weather)
+      Weather(x.City, x.District).then(function (y) {
+        console.log(y)
         obj['predict'] = y
-        
+        check[x.District] = y
         resolve()
       })
 
     })
   })
 }
-
-
+//var aaa = { aaa: 'aaa' }
+//predict(25.0322875976563, 121.488914489746, aaa).then(() => console.log(aaa))
 
 module.exports = {
   predict,

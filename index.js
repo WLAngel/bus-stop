@@ -27,20 +27,32 @@ const days = {
 }
 
 app.post('/routes', (req, res) => {
-  // TODO error handling
   var city = req.body.City
   var routename = req.body.RouteName
 
   bus.Route(routename, c.En[city]).catch(() => {
     return ''
   }).then(stoplist => {
-    if (stoplist.length === 0) {
+
+    if(stoplist.filter(x => x.KeyPattern).length) {
+      stoplist = stoplist.filter(x => x.KeyPattern)
+    }
+    else {
+      let Dir = []
+      Dir[0] = stoplist.filter(x => x.Direction === 0)
+      Dir[1] = stoplist.filter(x => x.Direction === 1)
+      Dir[0] = Dir[0].reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
+      Dir[1] = Dir[1].reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
+      stoplist = [Dir[0], Dir[1]]
+    }
+    if(stoplist.length === 0) {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
         'City or check your input. <a href=\'/bus\'>返回</a>')
     }
+      console.log(stoplist[0].Stops[0].Position)
     for (var promises = [], station, i = 0; i < stoplist[0].Stops.length; i++) {
       station = stoplist[0].Stops[i]
-      promises[i] = weather.predict(station.Position.lat, station.Position.lng,'', station)
+      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station)
     }
     Promise.all(promises).then(function () {
       promises = []
@@ -81,39 +93,45 @@ app.get('/bus', (req, res) => {
   })
 })
 
+app.post('/ajbus', (req, res) => {
+  var city = req.body.City
+
+  bus.getRouteList(c.En[city]).then(routelist => {
+    res.render('routeselect', {
+      routelist
+    })
+  })
+})
+
 app.post('/ajroutes', (req, res) => {
   var city = req.body.City
   var routename = req.body.RouteName
   var direction = req.body.Direction
 
-  bus.EstimatedTimeOfArrival(routename, c.En[city], direction).catch(console.error).then(est => {
+  bus.EstimatedTimeOfArrival(routename, c.En[city], direction).then(est => {
     bus.Route(routename, c.En[city]).then(routelist => {
-      busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()]).then(schedule => {
-
-        if (routelist[0].Direction == direction)
-          var Stops = routelist[0].Stops
-        else
-          var Stops = routelist[1].Stops
-
+      routelist = routelist.filter(x => x.Direction == direction)
+      key = routelist.filter(x => x.KeyPattern === true)[0]
+      sub = routelist.filter(x => x.KeyPattern === false).reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
+      if(key === undefined)
+        key = sub
+      busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()], sub.SubRouteName).then(schedule => {
+        var Stops = key.Stops
         var estimate = {}
         for (var i = 0; i < est.length; i++) {
           estimate[est[i].StopName] = est[i].EstimateTime
         }
 
-        if (schedule.TimeTable) {
-          if (estimate[Stops[0].StopName] === undefined) {
+        if(schedule.TimeTable && schedule.TimeTable.length) {
+          if(estimate[Stops[0].StopName] === undefined) {
             function nextBus(now) {
               var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0]) * 100 + Number(x.DepartureTime.split(':')[1]) >= now.getHours() * 100 + now.getMinutes())
               return filt[0]
             }
             var next = nextBus(new Date())
             estimate[next.StopName] = next.DepartureTime
-
-
           }
         }
-
-
         res.render('routeBody', {
           Stops,
           estimate,
