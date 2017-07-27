@@ -52,13 +52,25 @@ app.post('/routes', (req, res) => {
     }
     if(stoplist.length === 0) {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
-      'City or check your input. <a href=\'/bus\'>返回</a>')
+        'City or check your input. <a href=\'/bus\'>返回</a>')
     }
-    res.render('routes', {
-      city,
-      routename,
-      stoplist,
+      
+    for (var promises = [], station, i = 0; i < stoplist[0].Stops.length; i++) {
+      station = stoplist[0].Stops[i]
+      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station)
+    }
+    Promise.all(promises).then(function () {
+      promises = []
+      
+      res.render('routes', {
+        city,
+        routename,
+        stoplist,
+      })
     })
+
+    
+
   })
 })
 
@@ -68,9 +80,9 @@ app.post('/stops', (req, res) => {
   var stopname = req.body.StopName
 
   bus.Stop(stopname, c.En[city]).then(routelist => {
-    if(routelist.length === 0) {
+    if (routelist.length === 0) {
       return res.status(404).send('Can\'t find any RouteName in the City for the Stop, ' +
-      'please try another City or check your input. <a href=\'/bus\'>返回</a>')
+        'please try another City or check your input. <a href=\'/bus\'>返回</a>')
     }
     res.render('stops', {
       city,
@@ -112,6 +124,7 @@ app.post('/ajroutes', (req, res) => {
         var Stops = key.Stops
         console.log(est)
         var estimate = {}
+
         for(var i = 0; i < est.length; i++) {
           estimate[est[i].StopName] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
         }
@@ -119,7 +132,7 @@ app.post('/ajroutes', (req, res) => {
           console.log(schedule.TimeTable)
           if(estimate[Stops[0].StopName] === undefined) {
             function nextBus(now) {
-              var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0])*100+Number(x.DepartureTime.split(':')[1]) >= now.getHours()*100 + now.getMinutes() )
+              var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0]) * 100 + Number(x.DepartureTime.split(':')[1]) >= now.getHours() * 100 + now.getMinutes())
               return filt[0]
             }
             var next = nextBus(new Date())

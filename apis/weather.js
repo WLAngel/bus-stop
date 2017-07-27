@@ -33,6 +33,10 @@ function Weather(City, District) {
           'RainProb': weather[i][5],
         }
       }
+      weather = {
+        District,
+        weather
+      }
       resolve(weather)
     })
   })
@@ -56,37 +60,23 @@ function Position(lat, lng) {
   })
 }
 
-function predict(array) {
+function predict(lat, lng, obj) {
   return new Promise((resolve, reject) => {
-    let promises = [], check = {}
-    for (let i = 0; i < array.length; i++)
-      promises[i] = Position(array[i].Position.lat, array[i].Position.lng).then(x => array[i]['City'] = x)
-    Promise.all(promises).then(() => {
-      promises = []
-      for (let i = 0; i < array.length; i++) {
-        if (check[array[i].City.District])
-          array[i]['Weather'] = check[array[i].City.District]
-        else
-          promises[i] = Weather(array[i].City.City, array[i].City.District).then(x => {
-            array[i]['Weather'] = x
-            check[array[i].City.District] = x
-          })
-      }
-      Promise.all(promises).then(() => resolve(array))
+    let check = {}
+    Position(lat, lng).then(x => {
+      if (check[x.District])
+        resolve(check.weather)
+      Weather(x.City, x.District).then(function (y) {
+        
+        obj['predict'] = y
+        check[x.District] = y
+        resolve()
+      })
+
     })
   })
-
-  // [
-  //   {
-  //     Time: 'HH:MM', // until today ends
-  //     Condition: string,
-  //     Temperature: number(degree C),
-  //     FeelTemp: number(degree C),
-  //     Humidity: N %,
-  //     RainProb: N %
-  // }
-  // ]
 }
+
 
 module.exports = {
   predict,
