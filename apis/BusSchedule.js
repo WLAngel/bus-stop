@@ -1,6 +1,6 @@
 var request = require('request');
 
-function BusSchedule(RouteName, City, Direction, Day) {
+function BusSchedule(RouteName, City, Direction, Day, SubRouteName) {
     RouteName = encodeURI(RouteName)
     return new Promise(function (resolve, reject) {
         let url = `http://ptx.transportdata.tw/MOTC/v2/Bus/Schedule/City/${City}/${RouteName}?$filter=RouteName%2FZh_tw%20eq%20%27${RouteName}%27&$format=JSON`
@@ -13,9 +13,13 @@ function BusSchedule(RouteName, City, Direction, Day) {
                 if (!body)
                     return []
                 body = JSON.parse(body)
+                if(body.length === 0) {
+                  return resolve({})
+                }
                 if (body.length > 2) {
-                    let SubRoute = body.map((e, i, a) => e.SubRouteID).filter((e, i, a) => a.indexOf(e) !== i || a.lastIndexOf(e) !== i)
-                    body = body.filter((e) => e.SubRouteID === SubRoute[0])
+                    // let SubRoute = body.map((e, i, a) => e.SubRouteID).filter((e, i, a) => a.indexOf(e) !== i || a.lastIndexOf(e) !== i)
+                    // body = body.filter((e) => e.SubRouteID === SubRoute[0])
+                    body = body.filter(x => x.SubRouteName.Zh_tw === SubRouteName.Zh_tw)
                 }
                 body = body.filter((e) => e.Direction === Direction)
                 body = body[0]
