@@ -60,7 +60,7 @@ function predict(array) {
   return new Promise((resolve, reject) => {
     let promises = [], check = {}
     for (let i = 0; i < array.length; i++)
-      promises[i] = Position(array[i].lat, array[i].lng).then(x => array[i]['City'] = x)
+      promises[i] = Position(array[i].Position.lat, array[i].Position.lng).then(x => array[i]['City'] = x)
     Promise.all(promises).then(() => {
       promises = []
       for (let i = 0; i < array.length; i++) {
