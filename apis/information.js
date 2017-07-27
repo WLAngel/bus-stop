@@ -5,6 +5,7 @@ function Stop(StopName, City) {
         let Name = encodeURI(StopName),
             localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}?$filter=Stops%2Fany(d%3Ad%2FStopName%2FZh_tw%20eq%20'${Name}')%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
             Route = []
+        // console.log(localUri)
         request({ uri: localUri },
             (err, res, data) => {
                 if (err)
@@ -24,8 +25,10 @@ function Stop(StopName, City) {
 function Route(RouteName, City) {
     return new Promise((resolve, reject) => {
         let Name = encodeURI(RouteName),
-            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
+            // localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
+            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20&$format=JSON`,
             Stops = []
+        // console.log(localUri)
         request({ uri: localUri },
             (err, res, data) => {
                 if (err || res.statusCode !== 200)
@@ -34,8 +37,10 @@ function Route(RouteName, City) {
                     data = JSON.parse(data)
                     for (let i = 0; i < data.length; i++) {
                         Stops.push({
+                            'KeyPattern': data[i]['KeyPattern'],
                             'RouteName': data[i]['RouteName']['Zh_tw'],
-                            'Direction': data[i]["Direction"]
+                            'Direction': data[i]['Direction'],
+                            'SubRouteUID': data[i]['SubRouteUID'],
                         })
                         Stops[i]['Stops'] = []
                         for (let j = 0; j < data[i]['Stops'].length; j++) {
@@ -56,11 +61,34 @@ function Route(RouteName, City) {
     })
 }
 
+function getRouteList(City) {
+    return new Promise((resolve, reject) => {
+        let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
+            routelist = []
+
+        request({ uri: localUri },
+            (err, res, data) => {
+                if (err)
+                    reject(err)
+                else {
+                    data = JSON.parse(data)
+                    for (let i = 0; i < data.length; i++) {
+                        routelist.push({
+                            'RouteName': data[i]['RouteName']['Zh_tw'],
+                        })
+                    }
+                    resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
+                }
+            }
+        )
+    })
+}
+
 
 function EstimatedTimeOfArrival(RouteName, City, Direction) {
     return new Promise((resolve, reject) => {
         let Name = encodeURI(RouteName),
-            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27&$%from=JSON`,
+            localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27&$format=JSON`,
             Buses = []
         request({ uri: localUri },
             (err, res, data) => {
@@ -122,4 +150,5 @@ module.exports = {
     Route,
     EstimatedTimeOfArrival,
     RealTimeByFrequency,
-  }
+    getRouteList,
+}
