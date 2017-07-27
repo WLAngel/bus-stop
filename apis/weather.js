@@ -67,7 +67,11 @@ function predict(lat, lng, obj) {
       if (check[x.District])
         resolve(check.weather)
       Weather(x.City, x.District).then(function (y) {
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 32a59a856e58e86e7fc007f11c304aa3300e0c81
         obj['predict'] = y
         check[x.District] = y
         resolve()

@@ -49,6 +49,7 @@ html
         var buttons = document.getElementsByTagName('button')
         for(var i = 0; i < buttons.length; i++) {
           buttons[i].style.backgroundColor = 'white'
+          buttons[i].disabled = true
         }
         document.getElementsByClassName('left')[0].innerHTML = '<div id=\'loader\'></div>'
         
@@ -56,6 +57,10 @@ html
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             document.getElementsByClassName('left')[0].innerHTML = this.responseText
+            
+            for(var i = 0; i < buttons.length; i++) {
+              buttons[i].disabled = false
+            }
             
             var resScript = this.responseText.split('<\/script>')[0].slice(8)
             eval(resScript)
@@ -67,55 +72,67 @@ html
             element.style.backgroundColor = '#ffb3b3'
             
             if(schedule.TimeTable !== undefined) {
-              for(var i = 0; i < schedule.TimeTable.length; i++) {
-                if(i%4 === 0) {
-                  if(i !== 0) {
-                    tbody.appendChild(node)
+              if(schedule.TimeTable.length) {
+                for(var i = 0; i < schedule.TimeTable.length; i++) {
+                  if(i%4 === 0) {
+                    if(i !== 0) {
+                      tbody.appendChild(node)
+                    }
+                    var node = document.createElement('tr')
                   }
-                  var node = document.createElement('tr')
+                  nodeContent = document.createElement('td')
+                  nodeContent.append(schedule.TimeTable[i].DepartureTime)
+                  node.appendChild(nodeContent)
+                  
                 }
+                tbody.appendChild(node)
+                table.style = 'border-collapse: collapse; width: 100%'
+                table.appendChild(tbody)
+                document.getElementsByClassName('schContent')[0].appendChild(table)
+              }
+              else {
+                document.getElementsByClassName('schContent')[0].innerHTML = '今日未營運'
+              }
+            }
+            else if(schedule.Frequencys !== undefined) {
+              if(schedule.Frequencys.length) {
+                var node = document.createElement('tr')
+                
                 nodeContent = document.createElement('td')
-                nodeContent.append(schedule.TimeTable[i].DepartureTime)
+                nodeContent.append('時間間距')
                 node.appendChild(nodeContent)
                 
-              }
-              if(schedule.TimeTable.length%4)
+                nodeContent = document.createElement('td')
+                nodeContent.append('發車間距')
+                node.appendChild(nodeContent)
+                
                 tbody.appendChild(node)
-              table.style = 'border-collapse: collapse; width: 100%'
-              table.appendChild(tbody)
-              document.getElementsByClassName('schContent')[0].appendChild(table)
+                
+                for(var i = 0; i < schedule.Frequencys.length; i++) {
+                  node = document.createElement('tr')
+                  nodeContent = document.createElement('td')
+                  nodeContent.append(schedule.Frequencys[i].StartTime + ' ~ ' + schedule.Frequencys[i].EndTime)
+                  node.appendChild(nodeContent)
+                  
+                  nodeContent = document.createElement('td')
+                  var temp = schedule.Frequencys[i].MinHeadwayMins === schedule.Frequencys[i].MaxHeadwayMins ? schedule.Frequencys[i].MinHeadwayMins : (schedule.Frequencys[i].MinHeadwayMins + ' ~ ' + schedule.Frequencys[i].MaxHeadwayMins)
+                  nodeContent.append(temp + ' 分')
+                  node.appendChild(nodeContent)
+                  
+                  tbody.appendChild(node)
+                }
+                table.style = 'border-collapse: collapse; width: 100%'
+                table.appendChild(tbody)
+                document.getElementsByClassName('schContent')[0].appendChild(table)
+              }
+              else {
+                document.getElementsByClassName('schContent')[0].innerHTML = '今日未營運'
+              }
             }
             else {
-              var node = document.createElement('tr')
-              
-              nodeContent = document.createElement('td')
-              nodeContent.append('時間間距')
-              node.appendChild(nodeContent)
-              
-              nodeContent = document.createElement('td')
-              nodeContent.append('發車間距')
-              node.appendChild(nodeContent)
-              
-              tbody.appendChild(node)
-              
-              for(var i = 0; i < schedule.Frequencys.length; i++) {
-                node = document.createElement('tr')
-                nodeContent = document.createElement('td')
-                nodeContent.append(schedule.Frequencys[i].StartTime + ' ~ ' + schedule.Frequencys[i].EndTime)
-                node.appendChild(nodeContent)
-                
-                nodeContent = document.createElement('td')
-                var temp = schedule.Frequencys[i].MinHeadwayMins === schedule.Frequencys[i].MaxHeadwayMins ? schedule.Frequencys[i].MinHeadwayMins : (schedule.Frequencys[i].MinHeadwayMins + ' ~ ' + schedule.Frequencys[i].MaxHeadwayMins)
-                nodeContent.append(temp + ' 分')
-                node.appendChild(nodeContent)
-                
-                tbody.appendChild(node)
-              }
-              table.style = 'border-collapse: collapse; width: 100%'
-              table.appendChild(tbody)
-              document.getElementsByClassName('schContent')[0].appendChild(table)
-              
+              document.getElementsByClassName('schContent')[0].innerHTML = '查無班表'
             }
+              
             
           }
         }

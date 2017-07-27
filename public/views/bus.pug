@@ -12,11 +12,13 @@ html
           h3 想知道哪個公車路線嗎？
           form(method='POST' action='/routes')
             span(style='display: block') Choose a City:
-              select(name='City' style='margin: 10px')
+              select#City(name='City' style='margin: 10px')
                 each item in cities
                   option(value=item) #{item}
-            span Enter a RouteName of Bus: 
-              input(type='text' name='RouteName' required)
+            span(style='display: block; margin: 10px') Enter a RouteName of Bus: 
+              input#RouteInput(type='text' name='RouteName' required)
+            span(style='display: block; margin: 10px') Or select a RouteName: 
+              select#RouteSelect(disabled)
             Button(type='submit') submit
         div.utilContainer
           h3 想知道哪個公車站有哪些公車經過嗎？
@@ -25,6 +27,48 @@ html
               select(name='City' style='margin: 10px')
                 each item in cities
                   option(value=item) #{item}
-            span Enter a Name of a Stop: 
+            span(style='display: block; margin: 10px') Enter a Name of a Stop: 
               input(type='text' name='StopName' required)
             Button(type='submit') submit
+    script.
+      var routelist = document.getElementById('RouteSelect')
+      routelist.onchange = function() {
+        if(this.value !== '') {
+          document.getElementById('RouteInput').required = false
+          document.getElementById('RouteInput').name = ''
+          routelist.name = 'RouteName'
+          
+        }
+        else {
+          document.getElementById('RouteInput').required = true
+          document.getElementById('RouteInput').name = 'RouteName'
+          routelist.name = ''
+        }
+      }
+      var citylist = document.getElementById('City')
+      citylist.onchange = function() {
+        routelist.disabled = true
+        loadCity()
+      }
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        routelist.disabled = true
+        loadCity()
+      })
+      
+      function loadCity() {
+        var city = document.getElementById('City').value
+        var xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            routelist.disabled = false
+            routelist.innerHTML = this.responseText
+          }
+        }
+        xhttp.open('POST', '/ajbus', true)
+        xhttp.setRequestHeader("Content-type", "application/json")
+        
+        xhttp.send(JSON.stringify({
+          "City": city
+        }))
+      }
