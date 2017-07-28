@@ -28,7 +28,7 @@ function Route(RouteName, City) {
             // localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
             localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20&$format=JSON`,
             Stops = []
-            // console.log(localUri)
+        // console.log(localUri)
         request({ uri: localUri },
             (err, res, data) => {
                 if (err || res.statusCode !== 200)
@@ -62,26 +62,26 @@ function Route(RouteName, City) {
 }
 
 function getRouteList(City) {
-  return new Promise((resolve, reject) => {
-    let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
-        routelist = []
+    return new Promise((resolve, reject) => {
+        let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
+            routelist = []
 
-    request({ uri: localUri },
-      (err, res, data) => {
-        if (err)
-          reject(err)
-        else {
-          data = JSON.parse(data)
-          for (let i = 0; i < data.length; i++) {
-            routelist.push({
-              'RouteName': data[i]['RouteName']['Zh_tw'],
-            })
-          }
-          resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
-        }
-      }
-    )
-  })
+        request({ uri: localUri },
+            (err, res, data) => {
+                if (err)
+                    reject(err)
+                else {
+                    data = JSON.parse(data)
+                    for (let i = 0; i < data.length; i++) {
+                        routelist.push({
+                            'RouteName': data[i]['RouteName']['Zh_tw'],
+                        })
+                    }
+                    resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
+                }
+            }
+        )
+    })
 }
 
 
@@ -151,4 +151,4 @@ module.exports = {
     EstimatedTimeOfArrival,
     RealTimeByFrequency,
     getRouteList,
-  }
+}

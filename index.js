@@ -54,10 +54,10 @@ app.post('/routes', (req, res) => {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
         'City or check your input. <a href=\'/bus\'>返回</a>')
     }
-      
+    let check={}
     for (var promises = [], station, i = 0; i < stoplist[0].Stops.length; i++) {
       station = stoplist[0].Stops[i]
-      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station)
+      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station,check)
     }
     Promise.all(promises).then(function () {
       promises = []
@@ -122,14 +122,14 @@ app.post('/ajroutes', (req, res) => {
         key = sub
       busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()], sub.SubRouteUID).then(schedule => {
         var Stops = key.Stops
-        console.log(est)
+        // console.log(est)
         var estimate = {}
 
         for(var i = 0; i < est.length; i++) {
           estimate[est[i].StopName] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
         }
         if(schedule.TimeTable && schedule.TimeTable.length) {
-          console.log(schedule.TimeTable)
+          // console.log(schedule.TimeTable)
           if(estimate[Stops[0].StopName] === undefined) {
             function nextBus(now) {
               var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0]) * 100 + Number(x.DepartureTime.split(':')[1]) >= now.getHours() * 100 + now.getMinutes())
@@ -143,7 +143,7 @@ app.post('/ajroutes', (req, res) => {
             }
           }
         }
-        console.log(schedule)
+        // console.log(schedule)
         res.render('routeBody', {
           Stops,
           estimate,
