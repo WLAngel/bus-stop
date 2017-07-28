@@ -61,26 +61,26 @@ function Route(RouteName, City) {
 }
 
 function getRouteList(City) {
-  return new Promise((resolve, reject) => {
-    let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
-        routelist = []
+    return new Promise((resolve, reject) => {
+        let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
+            routelist = []
 
-    request({ uri: localUri },
-      (err, res, data) => {
-        if (err)
-          reject(err)
-        else {
-          data = JSON.parse(data)
-          for (let i = 0; i < data.length; i++) {
-            routelist.push({
-              'RouteName': data[i]['RouteName']['Zh_tw'],
-            })
-          }
-          resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
-        }
-      }
-    )
-  })
+        request({ uri: localUri },
+            (err, res, data) => {
+                if (err)
+                    reject(err)
+                else {
+                    data = JSON.parse(data)
+                    for (let i = 0; i < data.length; i++) {
+                        routelist.push({
+                            'RouteName': data[i]['RouteName']['Zh_tw'],
+                        })
+                    }
+                    resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
+                }
+            }
+        )
+    })
 }
 
 
@@ -153,4 +153,4 @@ module.exports = {
     EstimatedTimeOfArrival,
     RealTimeByFrequency,
     getRouteList,
-  }
+}

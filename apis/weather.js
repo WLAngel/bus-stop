@@ -8,7 +8,8 @@ function Weather(City, District) {
     let uri = `http://www.cwb.gov.tw/m/f/town368/${ID}.php`
     let weather = []
     request(uri, (err, res, body) => {
-
+      if (err)
+        reject(err)
       let $ = cheerio.load(body)
 
       $('#retab1 tbody tr').each(function (i, element) {
@@ -33,6 +34,10 @@ function Weather(City, District) {
           'RainProb': weather[i][5],
         }
       }
+      weather = {
+        District,
+        weather
+      }
       resolve(weather)
     })
   })
@@ -40,13 +45,21 @@ function Weather(City, District) {
 
 function Position(lat, lng) {
   return new Promise((resolve, reject) => {
-    let uri = `http://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true`
+    let uri = `https://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true&key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw`
 
     request(uri, (err, res, body) => {
+      if (err)
+        reject(err)
       body = JSON.parse(body)
+      if (body.status !== 'OK') {
+        console.log(body)
+        reject()
+      }
       let City, District
       for (let i = 0; i < body.results[0].address_components.length; i++) {
         if (body.results[0].address_components[i].types[0] === 'administrative_area_level_1')
+          City = body.results[0].address_components[i].short_name
+        else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_2')
           City = body.results[0].address_components[i].short_name
         else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_3')
           District = body.results[0].address_components[i].short_name
@@ -56,37 +69,22 @@ function Position(lat, lng) {
   })
 }
 
-function predict(array) {
+function predict(lat, lng, obj, check) {
   return new Promise((resolve, reject) => {
-    let promises = [], check = {}
-    for (let i = 0; i < array.length; i++)
-      promises[i] = Position(array[i].Position.lat, array[i].Position.lng).then(x => array[i]['City'] = x)
-    Promise.all(promises).then(() => {
-      promises = []
-      for (let i = 0; i < array.length; i++) {
-        if (check[array[i].City.District])
-          array[i]['Weather'] = check[array[i].City.District]
-        else
-          promises[i] = Weather(array[i].City.City, array[i].City.District).then(x => {
-            array[i]['Weather'] = x
-            check[array[i].City.District] = x
-          })
+    Position(lat, lng).then(x => {
+      if (check[x.District]) {
+        obj['predict'] = check[x.District]
+        resolve()
       }
-      Promise.all(promises).then(() => resolve(array))
+      Weather(x.City, x.District).then(function (y) {
+        obj['predict'] = y
+        check[x.District] = y
+        resolve()
+      })
     })
   })
-
-  // [
-  //   {
-  //     Time: 'HH:MM', // until today ends
-  //     Condition: string,
-  //     Temperature: number(degree C),
-  //     FeelTemp: number(degree C),
-  //     Humidity: N %,
-  //     RainProb: N %
-  // }
-  // ]
 }
+
 
 module.exports = {
   predict,
