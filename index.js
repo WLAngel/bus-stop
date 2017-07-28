@@ -61,7 +61,7 @@ app.post('/routes', (req, res) => {
     }
     Promise.all(promises).then(function () {
       promises = []
-      
+
       res.render('routes', {
         city,
         routename,
@@ -69,7 +69,7 @@ app.post('/routes', (req, res) => {
       })
     })
 
-    
+
 
   })
 })
@@ -124,22 +124,29 @@ app.post('/ajroutes', (req, res) => {
         var Stops = key.Stops
         var estimate = {}
 
-        est = est.filter(x => x.SubRouteUID === undefined ? true : x.SubRouteUID === sub.SubRouteUID)
-        for(var i = 0; i < est.length; i++) {
-          estimate[est[i].StopSequence] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
+        if(est.length) {
+          est = est.filter(x => x.SubRouteUID === undefined ? true : x.SubRouteUID === sub.SubRouteUID)
+          for(var i = 0; i < est.length; i++) {
+            estimate[est[i].StopSequence] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
+          }
+          if(schedule.TimeTable && schedule.TimeTable.length) {
+            if(estimate[Stops[0].StopSequence] === undefined) {
+              function nextBus(now) {
+                var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0]) * 100 + Number(x.DepartureTime.split(':')[1]) >= now.getHours() * 100 + now.getMinutes())
+                return filt[0]
+              }
+              var next = nextBus(new Date())
+              if(next)
+                estimate[next.StopSequence] = next.DepartureTime
+              else {
+                estimate[est[0].StopSequence] = null
+              }
+            }
+          }
         }
-        if(schedule.TimeTable && schedule.TimeTable.length) {
-          if(estimate[Stops[0].StopSequence] === undefined) {
-            function nextBus(now) {
-              var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0]) * 100 + Number(x.DepartureTime.split(':')[1]) >= now.getHours() * 100 + now.getMinutes())
-              return filt[0]
-            }
-            var next = nextBus(new Date())
-            if(next)
-              estimate[next.StopSequence] = next.DepartureTime
-            else {
-              estimate[est[0].StopSequence] = null
-            }
+        else {
+          for(var i = 0; i < Stops.length; i++) {
+            estimate[Stops[i].StopSequence] = undefined
           }
         }
         res.render('routeBody', {
