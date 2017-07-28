@@ -58,18 +58,18 @@ function Position(lat, lng) {
       let City, District, re = false
       for (let j = 0; j < body.results.length; j++) {
         for (let i = 0; i < body.results[j].address_components.length; i++) {
-          if (body.results[j].address_components[i].types[0] === 'administrative_area_level_1') 
+          if (body.results[j].address_components[i].types[0] === 'administrative_area_level_1')
             City = body.results[j].address_components[i].short_name
           else if (body.results[j].address_components[i].types[0] === 'administrative_area_level_2')
             City = body.results[j].address_components[i].short_name
           else if (body.results[j].address_components[i].types[0] === 'administrative_area_level_3')
             District = body.results[j].address_components[i].short_name
-          if (District&&CityID[City]) {
+          if (City && District && CityID[City.replace('台', '臺')]) {
             re = true
             break
           }
         }
-        if(re)
+        if (re)
           break
       }
       if (re)
