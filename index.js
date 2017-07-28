@@ -33,7 +33,7 @@ app.post('/routes', (req, res) => {
   bus.Route(routename, c.En[city]).catch(() => {
     return ''
   }).then(stoplist => {
-    if(stoplist.filter(x => x.KeyPattern).length) {
+    if (stoplist.filter(x => x.KeyPattern).length) {
       stoplist = stoplist.filter(x => x.KeyPattern)
     }
     else {
@@ -41,26 +41,25 @@ app.post('/routes', (req, res) => {
       Dir[0] = stoplist.filter(x => x.Direction === 0)
       Dir[1] = stoplist.filter(x => x.Direction === 1)
       stoplist = []
-      if(Dir[0].length) {
+      if (Dir[0].length) {
         Dir[0] = Dir[0].reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
         stoplist.push(Dir[0])
       }
-      if(Dir[1].length) {
+      if (Dir[1].length) {
         Dir[1] = Dir[1].reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
         stoplist.push(Dir[1])
       }
     }
-    if(stoplist.length === 0) {
+    if (stoplist.length === 0) {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
         'City or check your input. <a href=\'/bus\'>返回</a>')
     }
-    let check={}
+    let check = {}
     for (var promises = [], station, i = 0; i < stoplist[0].Stops.length; i++) {
       station = stoplist[0].Stops[i]
-      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station,check)
+      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station, check,city)
     }
     Promise.all(promises).then(function () {
-      promises = []
 
       res.render('routes', {
         city,
@@ -68,9 +67,6 @@ app.post('/routes', (req, res) => {
         stoplist,
       })
     })
-
-
-
   })
 })
 
@@ -118,25 +114,25 @@ app.post('/ajroutes', (req, res) => {
       routelist = routelist.filter(x => x.Direction == direction)
       key = routelist.filter(x => x.KeyPattern === true)[0]
       sub = routelist.filter(x => x.KeyPattern === false).reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
-      if(key === undefined)
+      if (key === undefined)
         key = sub
       busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()], sub.SubRouteUID).then(schedule => {
         var Stops = key.Stops
         var estimate = {}
 
-        if(est.length) {
+        if (est.length) {
           est = est.filter(x => x.SubRouteUID === undefined ? true : x.SubRouteUID === sub.SubRouteUID)
-          for(var i = 0; i < est.length; i++) {
+          for (var i = 0; i < est.length; i++) {
             estimate[est[i].StopSequence] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
           }
-          if(schedule.TimeTable && schedule.TimeTable.length) {
-            if(estimate[Stops[0].StopSequence] === undefined) {
+          if (schedule.TimeTable && schedule.TimeTable.length) {
+            if (estimate[Stops[0].StopSequence] === undefined) {
               function nextBus(now) {
                 var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0]) * 100 + Number(x.DepartureTime.split(':')[1]) >= now.getHours() * 100 + now.getMinutes())
                 return filt[0]
               }
               var next = nextBus(new Date())
-              if(next)
+              if (next)
                 estimate[next.StopSequence] = next.DepartureTime
               else {
                 estimate[est[0].StopSequence] = null
@@ -145,7 +141,7 @@ app.post('/ajroutes', (req, res) => {
           }
         }
         else {
-          for(var i = 0; i < Stops.length; i++) {
+          for (var i = 0; i < Stops.length; i++) {
             estimate[Stops[i].StopSequence] = null
           }
         }
