@@ -144,7 +144,7 @@ app.post('/ajroutes', (req, res) => {
         }
         else {
           for (var i = 0; i < Stops.length; i++) {
-            estimate[Stops[i].StopSequence] = null
+            estimate[Stops[i].StopSequence] = undefined
           }
         }
         res.render('routeBody', {

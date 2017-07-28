@@ -55,7 +55,7 @@ function Position(lat, lng) {
         return reject(err)
       body = JSON.parse(body)
       if (body.status !== 'OK') {
-        console.log(body)
+        // console.log(body)
         return reject(`status not OK`)
       }
       let City, District, re = false
