@@ -28,11 +28,7 @@ function Route(RouteName, City) {
             // localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
             localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20&$format=JSON`,
             Stops = []
-<<<<<<< HEAD
         // console.log(localUri)
-=======
-            // console.log(localUri)
->>>>>>> 32a59a856e58e86e7fc007f11c304aa3300e0c81
         request({ uri: localUri },
             (err, res, data) => {
                 if (err || res.statusCode !== 200)
@@ -66,7 +62,6 @@ function Route(RouteName, City) {
 }
 
 function getRouteList(City) {
-<<<<<<< HEAD
     return new Promise((resolve, reject) => {
         let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
             routelist = []
@@ -87,28 +82,6 @@ function getRouteList(City) {
             }
         )
     })
-=======
-  return new Promise((resolve, reject) => {
-    let localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
-        routelist = []
-
-    request({ uri: localUri },
-      (err, res, data) => {
-        if (err)
-          reject(err)
-        else {
-          data = JSON.parse(data)
-          for (let i = 0; i < data.length; i++) {
-            routelist.push({
-              'RouteName': data[i]['RouteName']['Zh_tw'],
-            })
-          }
-          resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
-        }
-      }
-    )
-  })
->>>>>>> 32a59a856e58e86e7fc007f11c304aa3300e0c81
 }
 
 
@@ -178,8 +151,4 @@ module.exports = {
     EstimatedTimeOfArrival,
     RealTimeByFrequency,
     getRouteList,
-<<<<<<< HEAD
 }
-=======
-  }
->>>>>>> 32a59a856e58e86e7fc007f11c304aa3300e0c81

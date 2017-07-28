@@ -8,7 +8,8 @@ function Weather(City, District) {
     let uri = `http://www.cwb.gov.tw/m/f/town368/${ID}.php`
     let weather = []
     request(uri, (err, res, body) => {
-
+      if (err)
+        reject(err)
       let $ = cheerio.load(body)
 
       $('#retab1 tbody tr').each(function (i, element) {
@@ -44,13 +45,21 @@ function Weather(City, District) {
 
 function Position(lat, lng) {
   return new Promise((resolve, reject) => {
-    let uri = `http://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true`
+    let uri = `https://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true&key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw`
 
     request(uri, (err, res, body) => {
+      if (err)
+        reject(err)
       body = JSON.parse(body)
+      if (body.status !== 'OK') {
+        console.log(body)
+        reject()
+      }
       let City, District
       for (let i = 0; i < body.results[0].address_components.length; i++) {
         if (body.results[0].address_components[i].types[0] === 'administrative_area_level_1')
+          City = body.results[0].address_components[i].short_name
+        else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_2')
           City = body.results[0].address_components[i].short_name
         else if (body.results[0].address_components[i].types[0] === 'administrative_area_level_3')
           District = body.results[0].address_components[i].short_name
@@ -60,23 +69,18 @@ function Position(lat, lng) {
   })
 }
 
-function predict(lat, lng, obj) {
+function predict(lat, lng, obj, check) {
   return new Promise((resolve, reject) => {
-    let check = {}
     Position(lat, lng).then(x => {
-      if (check[x.District])
-        resolve(check.weather)
+      if (check[x.District]) {
+        obj['predict'] = check[x.District]
+        resolve()
+      }
       Weather(x.City, x.District).then(function (y) {
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> 32a59a856e58e86e7fc007f11c304aa3300e0c81
         obj['predict'] = y
         check[x.District] = y
         resolve()
       })
-
     })
   })
 }
