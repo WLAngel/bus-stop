@@ -27,7 +27,8 @@ function BusSchedule(RouteName, City, Direction, Day, SubRouteUID) {
                     var day = body.Timetables.filter((e) => e.ServiceDay ? e.ServiceDay[Day] : e.SpecialDays).map(function (e) {
                         return {
                             StopName: e.StopTimes[0].StopName.Zh_tw,
-                            DepartureTime: e.StopTimes[0].DepartureTime
+                            DepartureTime: e.StopTimes[0].DepartureTime,
+                            StopSequence: e.StopTimes[0].StopSequence
                         }
                     }
                     )

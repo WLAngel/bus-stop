@@ -28,7 +28,6 @@ function Route(RouteName, City) {
             // localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20and%20KeyPattern%20eq%20true%20&$format=JSON`,
             localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27%20&$format=JSON`,
             Stops = []
-        // console.log(localUri)
         request({ uri: localUri },
             (err, res, data) => {
                 if (err || res.statusCode !== 200)
@@ -90,6 +89,7 @@ function EstimatedTimeOfArrival(RouteName, City, Direction) {
         let Name = encodeURI(RouteName),
             localUri = `http://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/${City}/${Name}?$filter=RouteName%2FZh_tw%20eq%20%27${Name}%27&$format=JSON`,
             Buses = []
+            // console.log(localUri)
         request({ uri: localUri },
             (err, res, data) => {
                 if (err)
@@ -105,9 +105,11 @@ function EstimatedTimeOfArrival(RouteName, City, Direction) {
                             'SrcUpdateTime': data[i]['SrcUpdateTime'],
                             'UpdateTime': data[i]['UpdateTime'],
                             'StopSequence': data[i]['StopSequence'],
+                            'SubRouteUID': data[i]['SubRouteUID'],
                         })
                     }
-                    resolve(Buses.filter(x => x.Direction == Direction).sort((x, y) => x.StopSequence - y.StopSequence))
+                    Buses = Buses.filter(x => x.Direction == Direction).sort((x, y) => x.StopSequence - y.StopSequence)
+                    resolve(Buses)
                 }
             })
     })
