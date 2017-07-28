@@ -143,6 +143,8 @@ app.post('/ajroutes', (req, res) => {
               }
             }
           }
+          else
+            schedule.TimeTable = undefined
         }
         else {
           for(var i = 0; i < Stops.length; i++) {

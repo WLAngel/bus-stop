@@ -23,6 +23,12 @@ function BusSchedule(RouteName, City, Direction, Day, SubRouteUID) {
                 }
                 body = body.filter((e) => e.Direction === Direction)
                 body = body[0]
+
+                Schedule = {
+                   RouteName: body.RouteName.Zh_tw,
+                   Direction: Direction,
+                }
+
                 if (body.Timetables) {
                     var day = body.Timetables.filter((e) => e.ServiceDay ? e.ServiceDay[Day] : e.SpecialDays).map(function (e) {
                         return {
@@ -32,11 +38,7 @@ function BusSchedule(RouteName, City, Direction, Day, SubRouteUID) {
                         }
                     }
                     )
-                     Schedule = {
-                        RouteName: body.RouteName.Zh_tw,
-                        Direction: Direction,
-                        TimeTable: day
-                    }
+                     Schedule.TimeTable = day
 
 
                     Schedule.TimeTable.sort((x, y) => {
@@ -45,7 +47,8 @@ function BusSchedule(RouteName, City, Direction, Day, SubRouteUID) {
                       return (Number(a[0])*100 + Number(a[1])) -
                         (Number(b[0])*100 + Number(b[1]))
                     })
-                } else {
+                }
+                if (body.Frequencys) {
                     day = body.Frequencys.filter((e) => e.ServiceDay[Day]).map(function (e) {
                         return {
                             StartTime: e.StartTime,
@@ -55,11 +58,7 @@ function BusSchedule(RouteName, City, Direction, Day, SubRouteUID) {
                         }
 
                     })
-                     Schedule = {
-                        RouteName: body.RouteName.Zh_tw,
-                        Direction: Direction,
-                        Frequencys: day
-                    }
+                    Schedule.Frequencys = day
 
                     Schedule.Frequencys.sort((x, y) => {
                       a = x.StartTime.split(':')
