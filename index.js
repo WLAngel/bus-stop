@@ -110,27 +110,27 @@ app.post('/ajroutes', (req, res) => {
         key = sub
       busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()], sub.SubRouteUID).then(schedule => {
         var Stops = key.Stops
-        console.log(est)
         var estimate = {}
+
+        est = est.filter(x => x.SubRouteUID === undefined ? true : x.SubRouteUID === sub.SubRouteUID)
+
         for(var i = 0; i < est.length; i++) {
-          estimate[est[i].StopName] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
+          estimate[est[i].StopSequence] = est[i].EstimateTime < 0 ? undefined : est[i].EstimateTime
         }
         if(schedule.TimeTable && schedule.TimeTable.length) {
-          console.log(schedule.TimeTable)
-          if(estimate[Stops[0].StopName] === undefined) {
+          if(estimate[Stops[0].StopSequence] === undefined) {
             function nextBus(now) {
               var filt = schedule.TimeTable.filter(x => Number(x.DepartureTime.split(':')[0])*100+Number(x.DepartureTime.split(':')[1]) >= now.getHours()*100 + now.getMinutes() )
               return filt[0]
             }
             var next = nextBus(new Date())
             if(next)
-              estimate[next.StopName] = next.DepartureTime
+              estimate[next.StopSequence] = next.DepartureTime
             else {
-              estimate[est[0].StopName] = null
+              estimate[est[0].StopSequence] = null
             }
           }
         }
-        console.log(schedule)
         res.render('routeBody', {
           Stops,
           estimate,

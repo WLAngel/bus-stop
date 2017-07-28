@@ -8,5 +8,5 @@ table.stoplist
   each item in Stops
     tr
       td= item.StopName + ' '
-      - var a = item.StopName
+      - var a = item.StopSequence
       td= estimate[a] !== undefined ? estimate[a] === null ? '末班車已過' : (typeof estimate[a] === 'string' ? estimate[a] + '發車' : (estimate[a] === 0 ? '進站中' : Math.floor(estimate[a]/60) ? Math.floor(estimate[a]/60) + '分' : '將進站')) : '未發車'
