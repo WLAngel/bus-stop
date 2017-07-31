@@ -137,9 +137,9 @@ function predict(StopList) {
         console.log(err)
       })
     }
-    
+
     Promise.all(promises).then(() => {
-      
+
       promises = []
       for (let i in position) {
         promises.push(Weather(position[i], i).then(x => {
