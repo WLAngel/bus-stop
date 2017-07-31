@@ -31,8 +31,8 @@ function Weather(City, District) {
           'Condition': weather[i][1],
           'Temperature': weather[i][2],
           'FeelTemp': weather[i][3],
-          'Humidity': weather[i][4],
-          'RainProb': weather[i][5],
+          'Humidity': weather[i][5],
+          'RainProb': weather[i][4],
         }
       }
       weather = {
@@ -48,7 +48,7 @@ function Position(lat, lng) {
   return new Promise((resolve, reject) => {
     if (lat == 0 || lng == 0)
       return reject(`Lat or Lng err`)
-    let uri = `https://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true&key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw`
+    let uri = `https://maps.google.com/maps/api/geocode/json?latlng=${lat},${lng}&language=zh-TW&sensor=true&key=AIzaSyBXekBOLWB1mdtaRr2qO-9r1QPNZZRiTM0`
 
     request(uri, (err, res, body) => {
       if (err)
@@ -76,7 +76,7 @@ function Position(lat, lng) {
           break
       }
       if (re)
-        resolve({ 'City': City.replace('台', '臺'), 'District': District.replace('台', '臺') })
+        resolve({ 'City': City.replace('台', '臺').replace('新北市', '臺北市'), 'District': District.replace('台', '臺') })
       else
         return reject(`Position err`)
     })
@@ -125,38 +125,35 @@ function CityWeather(City) {
   })
 }
 
-function predict(lat, lng, obj, check, City) {
+function predict(StopList) {
   return new Promise((resolve, reject) => {
-    Position(lat, lng).then(x => {
-      if (check[x.District]) {
-        obj['predict'] = check[x.District]
-        resolve()
+    let promises = [], position = {}
+    for (let i = 0; i < StopList.Stops.length; i++) {
+      promises[i] = Position(StopList.Stops[i].Position.lat, StopList.Stops[i].Position.lng).then(x => {
+        StopList.Stops[i].Position['City'] = x.City
+        StopList.Stops[i].Position['District'] = x.District
+        position[x.District] = x.City
+      }).catch((err) => {
+        console.log(err)
+      })
+    }
+    
+    Promise.all(promises).then(() => {
+      
+      promises = []
+      for (let i in position) {
+        promises.push(Weather(position[i], i).then(x => {
+          for (let num = 0; num < StopList.Stops.length; num++) {
+            if (StopList.Stops[num].Position.District === i)
+              StopList.Stops[num]['predict'] = x
+          }
+        }).catch((err) => {
+          console.log(err)
+        }))
       }
-      Weather(x.City, x.District).then(function (y) {
-        obj['predict'] = y
-        check[x.District] = y
+      Promise.all(promises).then(() => {
         resolve()
       })
-    }).catch(() => {
-      obj['predict'] = {
-        'District': '???',
-        'weather': [{
-          'Time': '???',
-          'Condition': '???',
-          'Temperature': '???',
-          'FeelTemp': '???',
-          'Humidity': '???',
-          'RainProb': '???'
-        }, {
-          'Time': '???',
-          'Condition': '???',
-          'Temperature': '???',
-          'FeelTemp': '???',
-          'Humidity': '???',
-          'RainProb': '???'
-        }]
-      }
-      resolve()
     })
   })
 }
