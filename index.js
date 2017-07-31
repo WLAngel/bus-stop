@@ -59,8 +59,7 @@ app.post('/routes', (req, res) => {
       station = stoplist[0].Stops[i]
       promises[i] = weather.predict(station.Position.lat, station.Position.lng, station, check,city)
     }
-    Promise.all(promises).then(function () {
-
+    Promise.all(promises).then(() => {
       res.render('routes', {
         city,
         routename,
