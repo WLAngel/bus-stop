@@ -71,7 +71,6 @@ app.post('/routes', (req, res) => {
 })
 
 app.post('/stops', (req, res) => {
-  // TODO error handling
   var city = req.body.City
   var stopname = req.body.StopName
 
