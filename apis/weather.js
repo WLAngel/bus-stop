@@ -2,6 +2,7 @@ const request = require('request')
 const cheerio = require('cheerio')
 const CityDistrictID = require('./../public/static/CityDistrictID.json')
 const CityID = require('./../public/static/CityID.json')
+const mongo = require('./position.js')
 
 function Weather(City, District) {
   return new Promise((resolve, reject) => {
@@ -127,32 +128,35 @@ function CityWeather(City) {
 
 function predict(StopList) {
   return new Promise((resolve, reject) => {
-    let promises = [], position = {}
+    let promises1 = [], promises2 = [], check = {}
     for (let i = 0; i < StopList.Stops.length; i++) {
-      promises[i] = Position(StopList.Stops[i].Position.lat, StopList.Stops[i].Position.lng).then(x => {
-        StopList.Stops[i].Position['City'] = x.City
-        StopList.Stops[i].Position['District'] = x.District
-        position[x.District] = x.City
-      }).catch((err) => {
-        console.log(err)
-      })
+      promises1.push(mongo.lookup(StopList.Stops[i].Position.lat, StopList.Stops[i].Position.lng).then(x => {
+        check[x.District] = x.City
+        StopList.Stops[i]['City'] = x.City
+        StopList.Stops[i]['District'] = x.District
+      }).catch(() => {
+        promises2.push(Position(StopList.Stops[i].Position.lat, StopList.Stops[i].Position.lng).then(x => {
+          check[x.District] = x.City
+          StopList.Stops[i]['City'] = x.City
+          StopList.Stops[i]['District'] = x.District
+          mongo.store(StopList.Stops[i].Position.lat, StopList.Stops[i].Position.lng, x.City, x.District)
+        }).catch(err => console.log(err)))
+      }))
     }
 
-    Promise.all(promises).then(() => {
-
-      promises = []
-      for (let i in position) {
-        promises.push(Weather(position[i], i).then(x => {
-          for (let num = 0; num < StopList.Stops.length; num++) {
-            if (StopList.Stops[num].Position.District === i)
-              StopList.Stops[num]['predict'] = x
-          }
-        }).catch((err) => {
-          console.log(err)
-        }))
-      }
-      Promise.all(promises).then(() => {
-        resolve()
+    Promise.all(promises1).then(() => {
+      Promise.all(promises2).then(() => {
+        let promises=[]
+        for (let i in check) {
+          promises.push(Weather(check[i], i).then(x => {
+            for (let num = 0; num < StopList.Stops.length; num++) {
+              if (StopList.Stops[num].District === i) {
+                StopList.Stops[num]['predict'] = x
+              }
+            }
+          }).catch(err => console.log(err)))
+        }
+        Promise.all(promises).then(() => resolve())
       })
     })
   })
