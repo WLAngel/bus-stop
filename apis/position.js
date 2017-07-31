@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient
 
-var url = 'mongodb://localhost:27017/position'
+// var url = 'mongodb://localhost:27017/position'
+var url = 'mongodb://Root:Root@bus-stop-shard-00-00-qemej.mongodb.net:27017,bus-stop-shard-00-01-qemej.mongodb.net:27017,bus-stop-shard-00-02-qemej.mongodb.net:27017/position?ssl=true&replicaSet=bus-stop-shard-0&authSource=admin'
 
 function store(Lat, Lng, City, District) {
   MongoClient.connect(url, (err, db) => {
@@ -21,6 +22,8 @@ function lookup(Lat, Lng) {
       var collection = db.collection('positions')
       collection.findOne({ Lat, Lng }).then(x => {
         db.close()
+        if(x === null)
+          return reject()
         resolve({
           City: x.City,
           District: x.District
@@ -34,3 +37,5 @@ module.exports = {
   lookup,
   store
 }
+// store(1, 2, 3, 4)
+// lookup(1, 2).catch(console.log).then(console.log)
