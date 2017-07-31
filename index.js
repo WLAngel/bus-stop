@@ -1,3 +1,8 @@
+const pwd = process.env.PASSWORD
+module.exports = {
+  pwd
+}
+
 var express = require('express')
 var path = require('path')
 var bodyparser = require('body-parser')
