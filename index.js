@@ -54,12 +54,7 @@ app.post('/routes', (req, res) => {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
         'City or check your input. <a href=\'/bus\'>返回</a>')
     }
-    let check = {}
-    for (var promises = [], station, i = 0; i < stoplist[0].Stops.length; i++) {
-      station = stoplist[0].Stops[i]
-      promises[i] = weather.predict(station.Position.lat, station.Position.lng, station, check,city)
-    }
-    Promise.all(promises).then(() => {
+    weather.predict(stoplist[0]).then(() => {
       res.render('routes', {
         city,
         routename,
