@@ -11,12 +11,14 @@ var bus = require('./apis/information.js')
 var busSch = require('./apis/BusSchedule.js')
 var weather = require('./apis/weather.js')
 var c = require('./public/static/city.js')
+var cookieParser = require('cookie-parser')
 
 var app = express()
 
 app.set('views', path.join(__dirname, 'public', 'views'))
 app.set('view engine', 'pug')
 
+app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
@@ -32,8 +34,14 @@ const days = {
 }
 
 app.post('/routes', (req, res) => {
-  var city = req.body.City
-  var routename = req.body.RouteName
+  if (req.body.Record) {
+    req.body.Record = JSON.parse(req.body.Record)
+    var city = req.body.Record.City
+    var routename = req.body.Record.RouteName
+  } else {
+    var city = req.body.City
+    var routename = req.body.RouteName
+  }
 
   bus.Route(routename, c.En[city]).catch(() => {
     return ''
@@ -60,11 +68,31 @@ app.post('/routes', (req, res) => {
         'City or check your input. <a href=\'/bus\'>返回</a>')
     }
     weather.predict(stoplist[0]).then(() => {
+      if (!req.cookies.record) {
+        res.cookie('record', [{ City: city, RouteName: routename }])
+      } else {
+        let record = req.cookies.record
+        for (var repeat = false, i = 0; i < record.length; i++) {
+          if (JSON.stringify({ City: city, RouteName: routename }) === JSON.stringify(record[i])) {
+            repeat = true
+            break
+          }
+        }
+        if (!repeat) {
+          if (record.length > 3) {
+            record.shift()
+          }
+          record.push({ City: city, RouteName: routename })
+          res.cookie('record', record)
+        }
+      }
+
       res.render('routes', {
         city,
         routename,
         stoplist,
       })
+
     })
   })
 })
@@ -87,7 +115,12 @@ app.post('/stops', (req, res) => {
 })
 
 app.get('/bus', (req, res) => {
+  var record = []
+  if (req.cookies.record) {
+    record = req.cookies.record
+  }
   res.render('bus.pug', {
+    record: record,
     cities: c.cities
   })
 })

@@ -33,6 +33,7 @@ function initMap() {
             position: position,
             map: map,
             title: station[i].StopName,
+            icon:icon,
             stay: false
         })
         MarkerObj[stopname].info = infowindow[stopname]
