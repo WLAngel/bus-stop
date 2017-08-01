@@ -7,6 +7,11 @@ html
   body
     div.content
       h1.title 簡易公車查詢
+      div
+      span 搜尋紀錄
+      each item in record
+        form(style='display:inline-block' method='POST' action='/routes')
+          button(type="submit" name='Record' value=item)= item.City+' '+item.RouteName
       div.container
         div.utilContainer 
           h3 想知道哪個公車路線嗎？
@@ -63,6 +68,7 @@ html
           if (this.readyState == 4 && this.status == 200) {
             routelist.disabled = false
             routelist.innerHTML = this.responseText
+            
           }
         }
         xhttp.open('POST', '/ajbus', true)

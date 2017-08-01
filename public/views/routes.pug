@@ -8,6 +8,7 @@ html
     script(async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw&callback=initMap")
     script.
       var data = !{ JSON.stringify(stoplist) }
+      var icon='../static/bus-stop.png'
   body
     div.content
       h1.title #{city} #{routename}
