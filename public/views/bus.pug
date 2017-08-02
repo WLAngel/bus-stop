@@ -20,7 +20,7 @@ html
               input#RouteInput(type='text' name='RouteName' required)
             span(style='display: block; margin: 10px') Or select a RouteName: 
               select#RouteSelect(disabled)
-            Button(type='submit') submit
+            Button.routeButton(type='submit') submit
           span(style='display:block; margin: 10px') 搜尋紀錄
           each item in record
             form(style='display:inline-block' method='POST' action='/routes')
@@ -34,7 +34,7 @@ html
                   option(value=item) #{item}
             span(style='display: block; margin: 10px') Enter a Name of a Stop: 
               input(type='text' name='StopName' required)
-            Button(type='submit') submit
+            Button.routeButton(type='submit') submit
     script.
       var routelist = document.getElementById('RouteSelect')
       routelist.onchange = function() {
