@@ -134,6 +134,7 @@ function CityWeather(City) {
 function predict(StopList) {
   return new Promise((resolve, reject) => {
     let promises1 = [], promises2 = [], check = {}
+    mongo.connect()
     for (let i = 0; i < StopList.Stops.length; i++) {
       let lat = StopList.Stops[i].Position.lat
       let lng = StopList.Stops[i].Position.lng
@@ -141,7 +142,9 @@ function predict(StopList) {
         check[x.District] = x.City
         StopList.Stops[i]['City'] = x.City
         StopList.Stops[i]['District'] = x.District
-      }).catch(() => {
+      }).catch((err) => {
+        if (err)
+          console.error(err)
         promises2.push(Position(lat, lng).then(x => {
           check[x.District] = x.City
           StopList.Stops[i]['City'] = x.City
@@ -153,6 +156,7 @@ function predict(StopList) {
 
     Promise.all(promises1).then(() => {
       Promise.all(promises2).then(() => {
+        mongo.close()
         let promises = []
         for (let i in check) {
           promises.push(Weather(check[i], i).then(x => {

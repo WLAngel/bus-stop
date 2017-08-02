@@ -6,9 +6,11 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "cheerio": "^1.0.0-rc.2",
+    "cookie-parser": "^1.4.3",
     "express": "^4.15.3",
     "install": "^0.10.1",
     "mongodb": "^2.2.30",
+    "mongoose": "^4.11.5",
     "path": "^0.12.7",
     "pug": "^2.0.0-rc.2",
     "request": "^2.81.0"
