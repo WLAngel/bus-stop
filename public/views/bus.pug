@@ -8,10 +8,6 @@ html
     div.content
       h1.title 簡易公車查詢
       div
-      span 搜尋紀錄
-      each item in record
-        form(style='display:inline-block' method='POST' action='/routes')
-          button(type="submit" name='Record' value=item)= item.City+' '+item.RouteName
       div.container
         div.utilContainer 
           h3 想知道哪個公車路線嗎？
@@ -25,6 +21,10 @@ html
             span(style='display: block; margin: 10px') Or select a RouteName: 
               select#RouteSelect(disabled)
             Button(type='submit') submit
+          span(style='display:block; margin: 10px') 搜尋紀錄
+          each item in record
+            form(style='display:inline-block' method='POST' action='/routes')
+              button.routeButton(type="submit" name='Record' value=item)= item.City+' '+item.RouteName
         div.utilContainer
           h3 想知道哪個公車站有哪些公車經過嗎？
           form(method='POST' action='/stops')
