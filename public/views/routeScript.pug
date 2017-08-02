@@ -9,6 +9,10 @@ script.
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
           document.getElementsByClassName('left')[0].innerHTML = this.responseText
+          var resScript = this.responseText.split('<\/script>')[0].slice(8)
+            var busPosition =resScript.split('\n')[0]
+            eval(busPosition)
+            bus.setPosition(busPosition)
         }
       }
       xhttp.open('POST', '/ajroutes', true)
@@ -19,6 +23,6 @@ script.
         "RouteName": routename,
         "Direction": routeID.slice(-1)
       }))
-      
+
     }, 15000)
   })
