@@ -8,10 +8,11 @@ html
     div.content
       h1.title 簡易公車查詢
       div
+        div#busLoader(style='display: none')
       div.container
         div.utilContainer 
           h3 想知道哪個公車路線嗎？
-          form(method='POST' action='/routes')
+          form(method='POST' action='/routes' onsubmit='onSubmit()')
             span(style='display: block') Choose a City:
               select#City(name='City' style='margin: 10px')
                 each item in cities
@@ -27,7 +28,7 @@ html
               button.routeButton(type="submit" name='Record' value=item)= item.City+' '+item.RouteName
         div.utilContainer
           h3 想知道哪個公車站有哪些公車經過嗎？
-          form(method='POST' action='/stops')
+          form(method='POST' action='/stops' onsubmit='onSubmit()')
             span(style='display: block') Choose a City:
               select(name='City' style='margin: 10px')
                 each item in cities
@@ -36,6 +37,12 @@ html
               input(type='text' name='StopName' required)
             Button.routeButton(type='submit') submit
     script.
+      function onSubmit() {
+        console.log(123)
+        var loader = document.getElementById('busLoader')
+        loader.style.display = 'block'
+      }
+      
       var routelist = document.getElementById('RouteSelect')
       routelist.onchange = function() {
         if(this.value !== '') {
