@@ -86,7 +86,6 @@ app.post('/routes', (req, res) => {
           res.cookie('record', record)
         }
       }
-
       res.render('routes', {
         city,
         routename,
@@ -178,7 +177,24 @@ app.post('/ajroutes', (req, res) => {
             estimate[Stops[i].StopSequence] = undefined
           }
         }
+        var busPosition=[]
+        for(var i in estimate){
+          if(estimate[i]!==undefined){
+            if(estimate[i]===0){
+              busPosition.push(Stops[String(Number(i)-1)])
+            }else{
+              if(estimate[String(Number(i)-1)]===undefined&&estimate[String(Number(i)+1)]>estimate[i]||
+                 estimate[String(Number(i)-1)]>estimate[i]&&estimate[String(Number(i)+1)]>estimate[i]||
+                 estimate[String(Number(i)-1)]===undefined&&estimate[String(Number(i)+1)]===undefined||
+                 estimate[String(Number(i)-1)]>estimate[i]&&estimate[String(Number(i)+1)]===undefined){
+                
+                  busPosition.push(Stops[String(Number(i)-1)])
+              }
+            }
+          }
+        }
         res.render('routeBody', {
+          busPosition,
           Stops,
           estimate,
           schedule
