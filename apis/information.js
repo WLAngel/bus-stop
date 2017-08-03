@@ -62,7 +62,7 @@ function getRouteList(City) {
     return new Promise((resolve, reject) => {
         let uri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
             routelist = []
-        
+
         request(uri, (err, res, data) => {
             if (err)
                 reject(err)
@@ -75,8 +75,7 @@ function getRouteList(City) {
                 }
                 resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
             }
-        }
-        )
+        })
     })
 }
 

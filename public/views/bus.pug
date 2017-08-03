@@ -24,7 +24,7 @@ html
             Button.routeButton(type='submit') submit
           span(style='display:block; margin: 10px') 搜尋紀錄
           each item in record
-            form(style='display:inline-block' method='POST' action='/routes')
+            form(style='display:inline-block' method='POST' action='/routes' onsubmit='onSubmit()')
               button.routeButton(type="submit" name='Record' value=item)= item.City+' '+item.RouteName
         div.utilContainer
           h3 想知道哪個公車站有哪些公車經過嗎？
