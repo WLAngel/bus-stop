@@ -2,6 +2,7 @@ script.
   var city = !{ JSON.stringify(city) }
   var routename = !{ JSON.stringify(routename) }
   var init = document.getElementById(routename+' 0')
+  var tmp
   document.addEventListener('DOMContentLoaded', function() {
     getStops(init)
     setInterval(() => {
@@ -12,12 +13,20 @@ script.
           var resScript = this.responseText.split('<\/script>')[0].slice(8)
             var busPosition =resScript.split('\n')[0]
             eval(busPosition)
-            bus.setPosition(busPosition)
+            if(tmp){
+                for(var i in tmp){
+                MarkerObj[tmp[i].StopName].setIcon(icon)
+              }
+            }
+            tmp=busPosition
+            for(var i in tmp){
+              MarkerObj[tmp[i].StopName].setIcon(busicon)
+            }
         }
       }
       xhttp.open('POST', '/ajroutes', true)
       xhttp.setRequestHeader("Content-type", "application/json")
-      
+
       xhttp.send(JSON.stringify({
         "City": city,
         "RouteName": routename,

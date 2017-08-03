@@ -10,9 +10,7 @@ function initMap() {
         north: Math.min.apply(null, lats),
         south: Math.max.apply(null, lats),
     });
-    var MarkerObj = {}, infowindow = {}
-    var estimate = 0
-
+    
     for (var i = 0, j = 0, position; i < station.length; i++) {
 
         position = { lat: station[i].Position.lat, lng: station[i].Position.lng }
@@ -70,10 +68,5 @@ function initMap() {
 
     }
     map.addListener('click', function () {
-    })
-    bus = new google.maps.Marker({
-        title: 'bus',
-        map: map,
-        icon:busicon,
     })
 }
