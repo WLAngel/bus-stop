@@ -58,24 +58,47 @@ function Route(RouteName, City) {
     })
 }
 
-function getRouteList(City) {
+function getRouteList(City, array) {
     return new Promise((resolve, reject) => {
-        let uri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`,
-            routelist = []
+        if(array) {
+          filter = `$filter=`
+          for(var i = 0; i < array.length-1; i++) {
+            filter += `RouteName%2FZh_tw%20eq%20%27${encodeURI(array[i])}%27%20or%20`
+          }
+          filter += `RouteName%2FZh_tw%20eq%20%27${encodeURI(array[i])}%27`
+          var uri = `http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/${City}?$select=RouteName%2CDirection&${filter}&$format=JSON`
+          let routelist = []
+          request(uri, (err, res, data) => {
+              if (err)
+                  reject(err)
+              else {
+                  data = JSON.parse(data)
+                  for (let i = 0; i < data.length; i++) {
+                      routelist.push(data[i]['RouteName']['Zh_tw'] + ' ' + data[i]['Direction'])
+                  }
 
-        request(uri, (err, res, data) => {
-            if (err)
-                reject(err)
-            else {
-                data = JSON.parse(data)
-                for (let i = 0; i < data.length; i++) {
-                    routelist.push({
-                        'RouteName': data[i]['RouteName']['Zh_tw'],
-                    })
-                }
-                resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
-            }
-        })
+                  resolve(routelist.filter((val, i, arr) => arr.indexOf(val) === i).sort())
+              }
+          })
+        }
+        else {
+          var uri = `http://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/${City}?$select=RouteName&$format=JSON`
+          let routelist = []
+
+          request(uri, (err, res, data) => {
+              if (err)
+                  reject(err)
+              else {
+                  data = JSON.parse(data)
+                  for (let i = 0; i < data.length; i++) {
+                      routelist.push({
+                          'RouteName': data[i]['RouteName']['Zh_tw'],
+                      })
+                  }
+                  resolve(routelist.sort((x, y) => x.RouteName.localeCompare(y.RouteName)))
+              }
+          })
+        }
     })
 }
 

@@ -105,11 +105,21 @@ app.post('/stops', (req, res) => {
       return res.status(404).send('Can\'t find any RouteName in the City for the Stop, ' +
         'please try another City or check your input. <a href=\'/bus\'>返回</a>')
     }
-    res.render('stops', {
-      city,
-      stopname,
-      routelist
-    })
+    else {
+      bus.getRouteList(c.En[city], routelist).then(ret => {
+        ret = ret.map(x => {
+          return {
+            RouteName: x.split(' ')[0],
+            Direction: x.split(' ')[1]
+          }
+        })
+        res.render('stops', {
+          city,
+          stopname,
+          routelist: ret
+        })
+      })
+    }
   })
 })
 
@@ -187,7 +197,7 @@ app.post('/ajroutes', (req, res) => {
                  estimate[String(Number(i)-1)]>estimate[i]&&estimate[String(Number(i)+1)]>estimate[i]||
                  estimate[String(Number(i)-1)]===undefined&&estimate[String(Number(i)+1)]===undefined||
                  estimate[String(Number(i)-1)]>estimate[i]&&estimate[String(Number(i)+1)]===undefined){
-                
+
                   busPosition.push(Stops[String(Number(i)-1)])
               }
             }
