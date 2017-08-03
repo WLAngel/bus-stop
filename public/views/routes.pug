@@ -7,8 +7,10 @@ html
     script(src='../static/googleinitMap.js')
     script(async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCDXOuy6JUbrfl6qLKNCXagS1ywRVg5hw&callback=initMap")
     script.
+      var MarkerObj = {}, infowindow = {}, busPosition=null, bus=null
       var data = !{ JSON.stringify(stoplist) }
       var icon='../static/bus-stop.png'
+      var busicon='../static/bus.png'
   body
     div.content
       h1.title #{city} #{routename}
@@ -53,19 +55,29 @@ html
           buttons[i].disabled = true
         }
         document.getElementsByClassName('left')[0].innerHTML = '<div id=\'loader\'></div>'
-        
+        var tmp
         var xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             document.getElementsByClassName('left')[0].innerHTML = this.responseText
-            
+
             for(var i = 0; i < buttons.length; i++) {
               buttons[i].disabled = false
             }
             
             var resScript = this.responseText.split('<\/script>')[0].slice(8)
+            var busPosition =resScript.split('\n')[0]
             eval(resScript)
-            
+            eval(busPosition)
+            if(tmp){
+                for(var i in tmp){
+                MarkerObj[tmp[i].StopName].setIcon(icon)
+              }
+            }
+            tmp=busPosition
+            for(var i in tmp){
+              MarkerObj[tmp[i].StopName].setIcon(busicon)
+            }
             document.getElementsByClassName('schContent')[0].innerHTML = ''
             
             var table = document.createElement('table')
@@ -139,7 +151,7 @@ html
         }
         xhttp.open('POST', '/ajroutes', true)
         xhttp.setRequestHeader("Content-type", "application/json")
-        
+
         City = city
         RouteName = routename
         routeID = element.id
