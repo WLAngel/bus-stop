@@ -50,31 +50,28 @@ exports.routes = (req, res) => {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
       'City or check your input. <a href=\'/bus\'>返回</a>')
     }
-    weather.predict(stoplist[0]).then(() => {
-      if (!req.cookies.record) {
-        res.cookie('record', [{ City: city, RouteName: routename }])
-      } else {
-        let record = req.cookies.record
-        for (var repeat = false, i = 0; i < record.length; i++) {
-          if (JSON.stringify({ City: city, RouteName: routename }) === JSON.stringify(record[i])) {
-            repeat = true
-            break
-          }
-        }
-        if (!repeat) {
-          if (record.length > 3) {
-            record.shift()
-          }
-          record.push({ City: city, RouteName: routename })
-          res.cookie('record', record)
+    if (!req.cookies.record) {
+      res.cookie('record', [{ City: city, RouteName: routename }])
+    } else {
+      let record = req.cookies.record
+      for (var repeat = false, i = 0; i < record.length; i++) {
+        if (JSON.stringify({ City: city, RouteName: routename }) === JSON.stringify(record[i])) {
+          repeat = true
+          break
         }
       }
-      res.render('routes', {
-        city,
-        routename,
-        stoplist,
-      })
-
+      if (!repeat) {
+        if (record.length > 3) {
+          record.shift()
+        }
+        record.push({ City: city, RouteName: routename })
+        res.cookie('record', record)
+      }
+    }
+    res.render('routes', {
+      city,
+      routename,
+      stoplist,
     })
   })
 }
@@ -123,6 +120,32 @@ exports.ajbus = (req, res) => {
   bus.getRouteList(c.En[city]).then(routelist => {
     res.render('routeselect', {
       routelist
+    })
+  })
+}
+
+exports.ajweather = (req, res) => {
+  var city = req.body.City
+  var routename = req.body.RouteName
+
+  bus.Route(routename, c.En[city]).catch(() => {
+    return ''
+  }).then(stoplist => {
+    if (stoplist.filter(x => x.KeyPattern).length) {
+      stoplist = stoplist.filter(x => x.KeyPattern)
+    }
+    else {
+      let Dir = []
+      Dir[0] = stoplist.filter(x => x.Direction === 0)
+      stoplist = []
+      if (Dir[0].length) {
+        Dir[0] = Dir[0].reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
+        stoplist.push(Dir[0])
+      }
+    }
+
+    weather.predict(stoplist[0]).then(() => {
+      res.send(stoplist[0])
     })
   })
 }

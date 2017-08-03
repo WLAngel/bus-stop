@@ -28,6 +28,7 @@ html
         span.close &times;
         h4 發車時間
         p.schContent loading..
+    div#snackbar 天氣載入好囉
     script.
       var modal = document.getElementById('modalWindow')
       var span = document.getElementsByClassName('close')[0]
@@ -168,3 +169,4 @@ html
         }))
       }
     include routeScript.pug
+    include ajweather.pug

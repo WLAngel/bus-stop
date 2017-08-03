@@ -30,6 +30,8 @@ app.post('/ajbus', router.ajbus)
 
 app.post('/ajroutes', router.ajroutes)
 
+app.post('/ajweather', router.ajweather)
+
 app.use('/', (req, res) => {
   res.status(404).send('not found')
 })
