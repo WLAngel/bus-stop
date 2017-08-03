@@ -69,16 +69,18 @@ html
             var busPosition =resScript.split('\n')[0]
             eval(resScript)
             eval(busPosition)
-            for(var i in MarkerObj){
+            for(var i in MarkerObj) {
               MarkerObj[i].setIcon(icon)
             }
             if(tmp){
-                for(var i in tmp){
-                MarkerObj[tmp[i].StopName].setIcon(icon)
+                for(var i in tmp) {
+                if(MarkerObj[tmp[i].StopName] !== undefined)
+                  MarkerObj[tmp[i].StopName].setIcon(icon)
               }
             }
-            tmp=busPosition
-            for(var i in tmp){
+            tmp = busPosition
+            for(var i in tmp) {
+              if(MarkerObj[tmp[i].StopName] !== undefined)
               MarkerObj[tmp[i].StopName].setIcon(busicon)
             }
             document.getElementsByClassName('schContent')[0].innerHTML = ''
