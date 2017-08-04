@@ -210,7 +210,10 @@ exports.ajroutes = (req, res) => {
             }
           }
         }
+        StopsName=Stops.map((e)=>e.StopName)
+        console.log(StopsName.length)
         res.render('routeBody', {
+          StopsName,
           busPosition,
           Stops,
           estimate,
