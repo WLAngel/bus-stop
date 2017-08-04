@@ -143,7 +143,14 @@ exports.ajweather = (req, res) => {
         stoplist.push(Dir[0])
       }
     }
-
+    let add={}
+    for(let i of stoplist[0].Stops){
+      add[i.StopName]=i
+    }
+    for(let i of stoplist[1].Stops){
+      if(!add[i.StopName])
+        stoplist[0].Stops.push(i)
+    }
     weather.predict(stoplist[0]).then(() => {
       res.send(stoplist[0])
     })
@@ -211,7 +218,6 @@ exports.ajroutes = (req, res) => {
           }
         }
         StopsName=Stops.map((e)=>e.StopName)
-        console.log(StopsName.length)
         res.render('routeBody', {
           StopsName,
           busPosition,
