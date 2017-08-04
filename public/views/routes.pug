@@ -66,10 +66,21 @@ html
               buttons[i].disabled = false
             }
             
+            
             var resScript = this.responseText.split('<\/script>')[0].slice(8)
             var busPosition =resScript.split('\n')[0]
+            var StopsName = resScript.split('\n')[2]
+            eval(StopsName)
             eval(resScript)
             eval(busPosition)
+            
+            for(var i in StopsName){
+              MarkerObj[StopsName[i]].setVisible(true)
+            }
+            for(var i in MarkerObj){
+              if(StopsName.indexOf(i)===-1)
+                MarkerObj[i].setVisible(false)
+            }
             for(var i in MarkerObj) {
               MarkerObj[i].setIcon(icon)
             }
@@ -162,6 +173,7 @@ html
         RouteName = routename
         routeID = element.id
         Direction = element.id.slice(-1)
+        console.log(Direction)
         xhttp.send(JSON.stringify({
           City,
           RouteName,

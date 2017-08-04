@@ -1,6 +1,7 @@
 function initMap() {
     var map = new google.maps.Map(document.getElementById('map'))
-    var station = data[0].Stops
+    var station
+    station = data[0].Stops
 
     var lngs = []
     var lats = []
@@ -19,25 +20,20 @@ function initMap() {
         north: Math.min.apply(null, lats),
         south: Math.max.apply(null, lats),
     });
-
-    for (var i = 0, j = 0, position; i < station.length; i++) {
-
-        position = { lat: station[i].Position.lat, lng: station[i].Position.lng }
-        if (position.lat === 0 || position.lng === 0)
-            continue
-        var stopname = station[i].StopName
+    function addMarker(station) {
+        position = { lat: station.Position.lat, lng: station.Position.lng }
         infowindow[stopname] = new google.maps.InfoWindow({
             content: `<div style="margin:0"><h4>站名：${stopname}<h4>`
         })
         MarkerObj[stopname] = new google.maps.Marker({
             position: position,
             map: map,
-            title: station[i].StopName,
+            title: station.StopName,
             icon: icon,
             stay: false
         })
+
         MarkerObj[stopname].info = infowindow[stopname]
-        // MarkerObj[stopname][stay] = fales
         MarkerObj[stopname].addListener('mouseover', function () {
             this.info.open(map, this);
         })
@@ -61,6 +57,15 @@ function initMap() {
         })
 
     }
-    map.addListener('click', function () {
-    })
+    for (var i = 0, position; i < station.length; i++) {
+        var stopname = station[i].StopName
+        addMarker(station[i])
+    }
+    station = data[1].Stops
+    for (var i = 0, position; i < station.length; i++) {
+        var stopname = station[i].StopName
+        if (MarkerObj[stopname] === undefined) {
+            addMarker(station[i])
+        }
+    }
 }
