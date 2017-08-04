@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
- //var MongoClient = require('mongodb').MongoClient
+//var MongoClient = require('mongodb').MongoClient
 const pwd = require('../index.js')
 //var url = 'mongodb://localhost:27017/position'
 const url = 'mongodb://Root:' + pwd.pwd + '@bus-stop-shard-00-00-qemej.mongodb.net:27017,bus-stop-shard-00-01-qemej.mongodb.net:27017,bus-stop-shard-00-02-qemej.mongodb.net:27017/position?ssl=true&replicaSet=bus-stop-shard-0&authSource=admin'
