@@ -84,7 +84,7 @@ function Position(lat, lng) {
       if (re)
         resolve({ City, District })
       else
-        return reject(new Error(`Position err`))
+        reject(new Error(`Position err`))
     })
   })
 }
