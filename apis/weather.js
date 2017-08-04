@@ -133,41 +133,38 @@ function CityWeather(City) {
 
 function predict(StopList) {
   return new Promise((resolve, reject) => {
-    let promises1 = [], promises2 = [], check = {}
+    let promises1 = [], promises2 = [], promises3 = [], check = {}
     mongo.connect()
-    for (let i = 0; i < StopList.Stops.length; i++) {
-      let lat = StopList.Stops[i].Position.lat
-      let lng = StopList.Stops[i].Position.lng
+    for (let Stop of StopList.Stops) {
+      let lat = Stop.Position.lat,lng = Stop.Position.lng
       promises1.push(mongo.lookup(lat, lng).then(x => {
         check[x.District] = x.City
-        StopList.Stops[i]['City'] = x.City
-        StopList.Stops[i]['District'] = x.District
+        Stop['City'] = x.City
+        Stop['District'] = x.District
       }).catch((err) => {
         if (err)
           console.error(err)
         promises2.push(Position(lat, lng).then(x => {
           check[x.District] = x.City
-          StopList.Stops[i]['City'] = x.City
-          StopList.Stops[i]['District'] = x.District
-          mongo.store(lat, lng, x.City, x.District)
+          Stop['City'] = x.City
+          Stop['District'] = x.District
+          promises3.push(mongo.store(lat, lng, x.City, x.District))
         }).catch(err => console.error(err)))
       }))
     }
 
     Promise.all(promises1).then(() => {
       Promise.all(promises2).then(() => {
-        mongo.close()
         let promises = []
         for (let i in check) {
           promises.push(Weather(check[i], i).then(x => {
-            for (let index = 0; index < StopList.Stops.length; index++) {
-              if (StopList.Stops[index].District === i) {
-                StopList.Stops[index]['predict'] = x
-              }
-            }
+            for (let Stop of StopList.Stops)
+              if (Stop.District === i)
+                Stop['predict'] = x
           }).catch(err => console.error(err)))
         }
         Promise.all(promises).then(() => resolve())
+        Promise.all(promises3).then(() => mongo.close())
       })
     })
   })

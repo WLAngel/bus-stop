@@ -21,14 +21,21 @@ function store(Lat, Lng, City, District) {
     City,
     District
   })
-  db.save()
+  return new Promise((resolve, reject) => {
+    position.findOne({ Lat, Lng }, (err, res) => {
+      if (!err && res === null) {
+        db.save()
+        resolve()
+      }
+    })
+  })
 }
 
 function lookup(Lat, Lng) {
   return new Promise((resolve, reject) => {
     position.findOne({ Lat, Lng }, (err, db) => {
       if (err)
-        reject(new Error(err))
+        reject(err)
       else {
         if (db === null)
           reject()
@@ -43,13 +50,13 @@ function lookup(Lat, Lng) {
 }
 
 function connect() {
-  console.log(`mongo connect`)
   mongoose.connect(url)
+  console.log(`mongo connect`)
 }
 
 function close() {
-  console.log(`mongo close`)
   mongoose.connection.close()
+  console.log(`mongo close`)
 }
 
 module.exports = {
