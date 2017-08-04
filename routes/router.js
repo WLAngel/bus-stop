@@ -48,7 +48,7 @@ exports.routes = (req, res) => {
     }
     if (stoplist.length === 0) {
       return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
-      'City or check your input. <a href=\'/bus\'>返回</a>')
+        'City or check your input. <a href=\'/bus\'>返回</a>')
     }
     if (!req.cookies.record) {
       res.cookie('record', [{ City: city, RouteName: routename }])
@@ -83,7 +83,7 @@ exports.stops = (req, res) => {
   bus.Stop(stopname, c.En[city]).then(routelist => {
     if (routelist.length === 0) {
       return res.status(404).send('Can\'t find any RouteName in the City for the Stop, ' +
-      'please try another City or check your input. <a href=\'/bus\'>返回</a>')
+        'please try another City or check your input. <a href=\'/bus\'>返回</a>')
     }
     else {
       bus.getRouteList(c.En[city], routelist).then(ret => {
@@ -143,13 +143,15 @@ exports.ajweather = (req, res) => {
         stoplist.push(Dir[0])
       }
     }
-    let add={}
-    for(let i of stoplist[0].Stops){
-      add[i.StopName]=i
-    }
-    for(let i of stoplist[1].Stops){
-      if(!add[i.StopName])
-        stoplist[0].Stops.push(i)
+    if (stoplist.length > 1) {
+      let add = {}
+      for (let i of stoplist[0].Stops) {
+        add[i.StopName] = i
+      }
+      for (let i of stoplist[1].Stops) {
+        if (!add[i.StopName])
+          stoplist[0].Stops.push(i)
+      }
     }
     weather.predict(stoplist[0]).then(() => {
       res.send(stoplist[0])
@@ -168,7 +170,7 @@ exports.ajroutes = (req, res) => {
       key = routelist.filter(x => x.KeyPattern === true)[0]
       sub = routelist.filter(x => x.KeyPattern === false).reduce((max, cur) => max.Stops.length < cur.Stops.length ? cur : max)
       if (key === undefined)
-      key = sub
+        key = sub
       busSch.BusSchedule(routename, c.En[city], Number(direction), days[new Date().getDay()], sub.SubRouteUID).then(schedule => {
         var Stops = key.Stops
         var estimate = {}
@@ -186,38 +188,38 @@ exports.ajroutes = (req, res) => {
               }
               var next = nextBus(new Date())
               if (next)
-              estimate[next.StopSequence] = next.DepartureTime
+                estimate[next.StopSequence] = next.DepartureTime
               else {
                 estimate[est[0].StopSequence] = null
               }
             }
           }
           else
-          schedule.TimeTable = undefined
+            schedule.TimeTable = undefined
         }
         else {
           for (var i = 0; i < Stops.length; i++) {
             estimate[Stops[i].StopSequence] = undefined
           }
         }
-        var busPosition=[]
-        for(var i in estimate) {
-          if(estimate[i]!==undefined) {
-            if(estimate[i]===0) {
-              busPosition.push(Stops[String(Number(i)-1)])
+        var busPosition = []
+        for (var i in estimate) {
+          if (estimate[i] !== undefined) {
+            if (estimate[i] === 0) {
+              busPosition.push(Stops[String(Number(i) - 1)])
             }
             else {
-              if(estimate[String(Number(i)-1)]===undefined&&estimate[String(Number(i)+1)]>estimate[i]||
-              estimate[String(Number(i)-1)]>estimate[i]&&estimate[String(Number(i)+1)]>estimate[i]||
-              estimate[String(Number(i)-1)]===undefined&&estimate[String(Number(i)+1)]===undefined||
-              estimate[String(Number(i)-1)]>estimate[i]&&estimate[String(Number(i)+1)]===undefined){
+              if (estimate[String(Number(i) - 1)] === undefined && estimate[String(Number(i) + 1)] > estimate[i] ||
+                estimate[String(Number(i) - 1)] > estimate[i] && estimate[String(Number(i) + 1)] > estimate[i] ||
+                estimate[String(Number(i) - 1)] === undefined && estimate[String(Number(i) + 1)] === undefined ||
+                estimate[String(Number(i) - 1)] > estimate[i] && estimate[String(Number(i) + 1)] === undefined) {
 
-                busPosition.push(Stops[String(Number(i)-1)])
+                busPosition.push(Stops[String(Number(i) - 1)])
               }
             }
           }
         }
-        StopsName=Stops.map((e)=>e.StopName)
+        StopsName = Stops.map((e) => e.StopName)
         res.render('routeBody', {
           StopsName,
           busPosition,
