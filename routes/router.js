@@ -29,6 +29,10 @@ exports.routes = (req, res) => {
   bus.Route(routename, c.En[city]).catch(() => {
     return ''
   }).then(stoplist => {
+    if (stoplist.length === 0) {
+      return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
+        'City or check your input. <a href=\'/bus\'>返回</a>')
+    }
     if (stoplist.filter(x => x.KeyPattern).length) {
       stoplist = stoplist.filter(x => x.KeyPattern)
     }
@@ -46,10 +50,7 @@ exports.routes = (req, res) => {
         stoplist.push(Dir[1])
       }
     }
-    if (stoplist.length === 0) {
-      return res.status(404).send('Can\'t find such RouteName in the City, please try another ' +
-        'City or check your input. <a href=\'/bus\'>返回</a>')
-    }
+    
     if (!req.cookies.record) {
       res.cookie('record', [{ City: city, RouteName: routename }])
     } else {
