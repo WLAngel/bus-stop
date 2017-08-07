@@ -66,7 +66,7 @@ function Position(lat, lng) {
       for (let j = 0; j < body.results.length; j++) {
         for (let i = 0; i < body.results[j].address_components.length; i++) {
           let area_level = body.results[j].address_components[i].types[0]
-          let short_name = body.results[j].address_components[i].short_name.replace('台', '臺').replace('新北市', '臺北市')
+          let short_name = body.results[j].address_components[i].short_name.replace('台', '臺')
           if (area_level === 'administrative_area_level_1')
             City = short_name
           else if (area_level === 'administrative_area_level_2')
