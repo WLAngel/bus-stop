@@ -9,7 +9,7 @@ html
       h1.title #{city} #{stopname}
       a(href='/bus' style='margin: 5%') 返回
       each item in routelist
-        button.routeButton(id=item.RouteName+' '+item.Direction onclick='getStops(this)')= item.RouteName + (item.Direction ? ' 返' : ' 去')
+        button.routeButton(id=item.RouteName+' '+item.Direction onclick='getStops(this)')= item.RouteName + (item.Direction === '1' ? ' 返' : ' 去')
       div.container
         div.left
         div.right
