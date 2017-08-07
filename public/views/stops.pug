@@ -21,6 +21,7 @@ html
         var buttons = document.getElementsByTagName('button')
         for(var i = 0; i < buttons.length; i++) {
           buttons[i].style.backgroundColor = 'white'
+          buttons[i].disabled = true
         }
         document.getElementsByClassName('left')[0].innerHTML = '<div id=\'loader\'></div>'
         
@@ -30,6 +31,9 @@ html
             if(this.responseURL.split('/').reverse()[0] === 'ajroutes') {
               document.getElementsByClassName('left')[0].innerHTML = this.responseText
               element.style.backgroundColor = '#ffb3b3'
+              for(var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false
+              }
             }
           }
         }
